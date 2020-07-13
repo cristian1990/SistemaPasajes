@@ -63,9 +63,10 @@
                 @Html.DropDownList("iidSexo", listaSexo, null, new { @class = "form-control" })
                 @Html.ValidationMessage("iidSexo", new { @class = "text-danger" })
             </div>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+            @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                 Guardar
-            </button>
+            </button>*@
+            <input type="submit" class="btn btn-primary" value="Enviar" />
             @Html.ActionLink("Regresar", "Index", "Empleado", null, new { @class = "btn btn-danger" })
         }
     </div>
