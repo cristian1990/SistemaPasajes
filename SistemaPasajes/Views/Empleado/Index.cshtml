@@ -1,0 +1,40 @@
+﻿@using SistemaPasajes.Models
+@model List<EmpleadoCLS>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<table class="table table-hover table-bordered" id="tablaEmpleado">
+    <thead>
+        <tr>
+            <td>@Html.LabelFor(p => Model[0].iidEmpleado)</td>
+            <td>@Html.LabelFor(p => Model[0].nombre)</td>
+            <td>@Html.LabelFor(p => Model[0].apPaterno)</td>
+            <td>@Html.LabelFor(p => Model[0].nombreTipoUsuario)</td>
+            <td>@Html.LabelFor(p => Model[0].nombreTipoContrato)</td>
+            <td>Operaciones</td>
+        </tr>
+
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.iidEmpleado</td>
+                <td>@item.nombre</td>
+                <td>@item.apPaterno</td>
+                <td>@item.nombreTipoUsuario</td>
+                <td>@item.nombreTipoContrato</td>
+                @*<td>
+                    @Html.ActionLink(" ", "Editar", "Empleado", new { id = @item.iidEmpleado }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                    <button type="button" onclick="mostrarPopup(@item.iidEmpleado)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+                    </button>
+                </td>*@
+            </tr>
+        }
+    </tbody>
+</table>
