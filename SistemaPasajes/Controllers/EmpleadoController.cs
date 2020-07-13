@@ -32,5 +32,77 @@ namespace SistemaPasajes.Controllers
             }
                 return View(listaEmpleados);
         }
+
+        public ActionResult Agregar() 
+        {
+            listarCombos();
+            return View();
+        }
+
+
+        //PARA LLENAR TODOS LOS COMBOBOX
+        //Creo todas las listas necesarias y las paso a la vista
+        public void listarComboSexo()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from sexo in bd.Sexo
+                         where sexo.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = sexo.NOMBRE,
+                             Value = sexo.IIDSEXO.ToString()
+                         }).ToList();
+                //Indico que al pricipio del combo aparece la palabra "Seleccione"
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaSexo = lista;
+            }
+        }
+
+        public void listarTipoContrato()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.TipoContrato
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDTIPOCONTRATO.ToString()
+                         }).ToList();
+
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaTipoContrato = lista;
+            }
+        }
+
+        public void listarTipoUsuario()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.TipoUsuario
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDTIPOUSUARIO.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaTipoUsuario = lista;
+            }
+        }
+
+        public void listarCombos()
+        {
+            listarTipoUsuario();
+            listarTipoContrato();
+            listarComboSexo();
+        }
     }
 }
