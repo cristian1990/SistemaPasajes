@@ -51,5 +51,22 @@ namespace SistemaPasajes.Controllers
             }
             return View(oMarcaCLS);
         }
+
+        //El id, lo pasamos desde la vista
+        public ActionResult Editar(int id)
+        {
+            MarcaCLS oMarcaCLS = new MarcaCLS();
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busca y almacena la marca con el ID pasado como parametro
+                Marca oMarca = bd.Marca.Where(p => p.IIDMARCA.Equals(id)).First();
+                //Llenamos el modelo
+                oMarcaCLS.iidmarca = oMarca.IIDMARCA;
+                oMarcaCLS.nombre = oMarca.NOMBRE;
+                oMarcaCLS.descripcion = oMarca.DESCRIPCION;
+            }
+
+            return View(oMarcaCLS);
+        }
     }
 }

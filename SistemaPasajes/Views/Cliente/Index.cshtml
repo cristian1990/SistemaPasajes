@@ -31,10 +31,10 @@
                 <td>@item.telefonoFijo</td>
                 <td>
                     @Html.ActionLink(" ", "Editar", "Cliente", new { id = @item.iidcliente }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    @*@Html.ActionLink(" ", "Eliminar", "Cliente", new { id = @item.iidcliente }, new { @class = "glyphicon glyphicon-trash btn btn-danger" })*@
+                    @Html.ActionLink(" ", "Eliminar", "Cliente", new { id = @item.iidcliente }, new { @class = "glyphicon glyphicon-trash btn btn-danger" })
 
-                    <button type="button" onclick="mostrarPopup(@item.iidcliente)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
-                    </button>
+                    @*<button type="button" onclick="mostrarPopup(@item.iidcliente)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+                    </button>*@
                 </td>
             </tr>
         }

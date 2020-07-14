@@ -55,5 +55,21 @@ namespace SistemaPasajes.Controllers
             }
             return View(oSucursalCLS);
         }
+
+        public ActionResult Editar(int id) //El id, lo recibo de la vista Index
+        {
+            SucursalCLS oSucursalCLS = new SucursalCLS();
+            using (var bd = new BDPasajeEntities())
+            {  //Buscamos la sucursal y la almacenamos en oSucursal
+                Sucursal oSucursal = bd.Sucursal.Where(p => p.IIDSUCURSAL.Equals(id)).First();
+                oSucursalCLS.iidsucursal = oSucursal.IIDSUCURSAL;
+                oSucursalCLS.nombre = oSucursal.NOMBRE;
+                oSucursalCLS.direccion = oSucursal.DIRECCION;
+                oSucursalCLS.telefono = oSucursal.TELEFONO;
+                oSucursalCLS.email = oSucursal.EMAIL;
+                oSucursalCLS.fechaApertura = (DateTime)oSucursal.FECHAAPERTURA;
+            }
+            return View(oSucursalCLS);
+        }
     }
 }
