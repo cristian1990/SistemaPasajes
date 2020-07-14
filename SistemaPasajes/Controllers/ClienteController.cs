@@ -84,5 +84,31 @@ namespace SistemaPasajes.Controllers
                 listaSexo.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
             }
         }
+
+        public ActionResult Editar(int id)
+        {
+            ClienteCLS oClienteCLS = new ClienteCLS();
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Para asignar el valor al ComboBox de la vista
+                llenarSexo();
+                ViewBag.lista = listaSexo;
+
+                //Busco y almaceno el cliente
+                Cliente oCLiente = bd.Cliente.Where(p => p.IIDCLIENTE.Equals(id)).First();
+                //Indico todos los campos a recuperar
+                oClienteCLS.iidcliente = oCLiente.IIDCLIENTE;
+                oClienteCLS.nombre = oCLiente.NOMBRE;
+                oClienteCLS.apPaterno = oCLiente.APPATERNO;
+                oClienteCLS.apMaterno = oCLiente.APMATERNO;
+                oClienteCLS.direccion = oCLiente.DIRECCION;
+                oClienteCLS.email = oCLiente.EMAIL;
+                oClienteCLS.iidsexo = (int)oCLiente.IIDSEXO;
+                oClienteCLS.telefonoCelular = oCLiente.TELEFONOCELULAR;
+                oClienteCLS.telefonoFijo = oCLiente.TELEFONOFIJO;
+            }
+            return View(oClienteCLS);
+        }
     }
 }
