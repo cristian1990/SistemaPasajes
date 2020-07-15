@@ -10,7 +10,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        @using (Html.BeginForm("Editar", "Sucursal", FormMethod.Post, new { @id = "frmSucursal" }))
+        @using (Html.BeginForm("Editar", "Marca", FormMethod.Post, new { @id = "frmEditar" }))
         {
             <div>
                 @Html.LabelFor(p => p.iidmarca)
@@ -39,3 +39,14 @@
         }
     </div>
 </div>
+
+<script>
+    //Para mostrar un mensaje de confirmacion
+    var frmEditar = document.getElementById("frmEditar");
+    frmEditar.onsubmit = function (e) { //Cuando se haga click en Submit
+        e.preventDefault(); //Detengo la ejecucion por defecto
+        if (confirm("¿Deseas guardar los cambios?") == 1) { //Aceptar vale 1, Cancelar vale 0
+            frmEditar.submit(); //Lo envio (Como si se hace click en el boton)
+        }
+    }
+</script>

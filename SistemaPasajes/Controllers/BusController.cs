@@ -75,6 +75,28 @@ namespace SistemaPasajes.Controllers
             return View(oBusClS);
         }
 
+        public ActionResult Editar(int id)
+        {
+            //Listo a la info de los ComboBox, necesario para poder editar
+            listarCombos();
+            BusCLS oBusCls = new BusCLS();
+            using (var bd = new BDPasajeEntities())
+            {
+                Bus obus = bd.Bus.Where(p => p.IIDBUS.Equals(id)).First();
+                oBusCls.iidBus = obus.IIDBUS;
+                oBusCls.iidSucursal = (int)obus.IIDSUCURSAL;
+                oBusCls.iidTipoBus = (int)obus.IIDTIPOBUS;
+                oBusCls.placa = obus.PLACA;
+                oBusCls.fechaCompra = (DateTime)obus.FECHACOMPRA;
+                oBusCls.iidModelo = (int)obus.IIDMODELO;
+                oBusCls.numeroColumnas = (int)obus.NUMEROCOLUMNAS;
+                oBusCls.numeroFilas = (int)obus.NUMEROFILAS;
+                oBusCls.descripcion = obus.DESCRIPCION;
+                oBusCls.observacion = obus.OBSERVACION;
+                oBusCls.iidmarca = (int)obus.IIDMARCA;
+            }
+            return View(oBusCls);
+        }
 
         //============================================================
 

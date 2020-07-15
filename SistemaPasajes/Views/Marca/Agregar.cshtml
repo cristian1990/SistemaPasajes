@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        @using (Html.BeginForm("Agregar", "Sucursal", FormMethod.Post, new { @id = "frmSucursal" }))
+        @using (Html.BeginForm("Agregar", "Marca", FormMethod.Post, new { @id = "frmAgregar" }))
         {
 
             <div>
@@ -34,3 +34,14 @@
         }
     </div>
 </div>
+
+<script>
+    //Para mostrar un mensaje de confirmacion
+    var frmAgregar = document.getElementById("frmAgregar");
+    frmAgregar.onsubmit = function (e) { //Cuando se haga click en Submit
+        e.preventDefault(); //Detengo la ejecucion por defecto
+        if (confirm("¿Deseas guardar los cambios?") == 1) { //Aceptar vale 1, Cancelar vale 0
+            frmAgregar.submit(); //Lo envio (Como si se hace click en el boton)
+        }
+    }
+</script>
