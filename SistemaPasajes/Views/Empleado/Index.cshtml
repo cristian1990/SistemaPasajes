@@ -30,11 +30,13 @@
                 <td>@item.apPaterno</td>
                 <td>@item.nombreTipoUsuario</td>
                 <td>@item.nombreTipoContrato</td>
-                @*<td>
-                        @Html.ActionLink(" ", "Editar", "Empleado", new { id = @item.iidEmpleado }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                        <button type="button" onclick="mostrarPopup(@item.iidEmpleado)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
-                        </button>
-                    </td>*@
+                <td>
+                    @Html.ActionLink(" ", "Editar", "Empleado", new { id = @item.iidEmpleado }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                    @Html.ActionLink(" ", "Eliminar", "Empleado", new { id = @item.iidEmpleado }, new { @class = "glyphicon glyphicon-trash btn btn-danger" })
+
+                    @*<button type="button" onclick="mostrarPopup(@item.iidEmpleado)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+                    </button>*@
+                </td>
             </tr>
         }
     </tbody>

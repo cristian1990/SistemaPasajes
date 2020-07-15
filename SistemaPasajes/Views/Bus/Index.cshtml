@@ -7,6 +7,8 @@
 
 <h2>Index</h2>
 
+@Html.ActionLink("Agregar", "Agregar", "Bus", null, new { @class = "btn btn-primary" })
+
 <table class="table table-bordered table-hover">
 
     <tr>
@@ -18,12 +20,12 @@
         <td>Operaciones</td>
     </tr>
     @*<tr>
-        <td>@Html.TextBox("iidBus", null, new { @class = "form-control" })</td>
-        <td>@Html.TextBox("placa", null, new { @class = "form-control" })</td>
-        <td>@Html.DropDownList("iidModelo", listaModelo, null, new { @class = "form-control" })</td>
-        <td>@Html.DropDownList("iidSucursal", listaSucursal, null, new { @class = "form-control" })</td>
-        <td>@Html.DropDownList("iidTipoBus", listaTipoBus, null, new { @class = "form-control" })</td>
-    </tr>*@
+            <td>@Html.TextBox("iidBus", null, new { @class = "form-control" })</td>
+            <td>@Html.TextBox("placa", null, new { @class = "form-control" })</td>
+            <td>@Html.DropDownList("iidModelo", listaModelo, null, new { @class = "form-control" })</td>
+            <td>@Html.DropDownList("iidSucursal", listaSucursal, null, new { @class = "form-control" })</td>
+            <td>@Html.DropDownList("iidTipoBus", listaTipoBus, null, new { @class = "form-control" })</td>
+        </tr>*@
     @foreach (var item in Model)
     {
         <tr>

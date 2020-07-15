@@ -38,5 +38,126 @@ namespace SistemaPasajes.Controllers
             }
                 return View(listaBus);
         }
+
+        public ActionResult Agregar()
+        {
+            //Listo a la info de loc ComboBox
+            listarCombos();
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Agregar(BusCLS oBusClS)
+        {
+            if (ModelState.IsValid)
+            {
+                using (var bd = new BDPasajeEntities())
+                {
+                    Bus oBus = new Bus();
+                    oBus.IIDSUCURSAL = oBusClS.iidSucursal;
+                    oBus.IIDTIPOBUS = oBusClS.iidTipoBus;
+                    oBus.PLACA = oBusClS.placa;
+                    oBus.FECHACOMPRA = oBusClS.fechaCompra;
+                    oBus.IIDMODELO = oBusClS.iidModelo;
+                    oBus.NUMEROFILAS = oBusClS.numeroFilas;
+                    oBus.NUMEROCOLUMNAS = oBusClS.numeroColumnas;
+                    oBus.DESCRIPCION = oBusClS.descripcion;
+                    oBus.OBSERVACION = oBusClS.observacion;
+                    oBus.IIDMARCA = oBusClS.iidmarca;
+                    oBus.BHABILITADO = 1;
+                    bd.Bus.Add(oBus);
+                    bd.SaveChanges();
+                }
+                return RedirectToAction("Index");
+            }
+
+            listarCombos();
+            return View(oBusClS);
+        }
+
+
+        //============================================================
+
+        //PARA LLENAR TODOS LOS COMBOBOX
+        //Creo todas las listas necesarias y las paso a la vista
+        public void listarTipoBus()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.TipoBus
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDTIPOBUS.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaTipoBus = lista;
+            }
+        }
+
+        public void listarMarca()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.Marca
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDMARCA.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaMarca = lista;
+            }
+        }
+
+        public void listarModelo()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.Modelo
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDMODELO.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaModelo = lista;
+            }
+        }
+
+        public void listarSucursal()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.Sucursal
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDSUCURSAL.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaSucursal = lista;
+            }
+        }
+
+        public void listarCombos()
+        {
+            listarSucursal();
+            listarModelo();
+            listarMarca();
+            listarTipoBus();
+        }
     }
 }

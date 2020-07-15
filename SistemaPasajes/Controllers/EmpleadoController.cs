@@ -68,6 +68,32 @@ namespace SistemaPasajes.Controllers
             return View(oEmpleadoCLS);
         }
 
+        public ActionResult Editar(int id)
+        {
+            listarCombos(); //cargo los ComboBox
+            EmpleadoCLS oEmpleadoCLS = new EmpleadoCLS();
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Obtengo y almaceno el empleado a editar
+                //Where devuelve varias filas, por eso se coloca First(), al final
+                Empleado oEmpleado = bd.Empleado.Where(p => p.IIDEMPLEADO.Equals(id)).First();
+                oEmpleadoCLS.iidEmpleado = oEmpleado.IIDEMPLEADO;
+                oEmpleadoCLS.nombre = oEmpleado.NOMBRE;
+                oEmpleadoCLS.apPaterno = oEmpleado.APPATERNO;
+                oEmpleadoCLS.apMaterno = oEmpleado.APMATERNO;
+                oEmpleadoCLS.fechaContrato = (DateTime)oEmpleado.FECHACONTRATO;
+                oEmpleadoCLS.sueldo = (decimal)oEmpleado.SUELDO;
+                oEmpleadoCLS.iidEmpleado = oEmpleado.IIDEMPLEADO;
+                oEmpleadoCLS.iidtipoUsuario = (int)oEmpleado.IIDTIPOUSUARIO;
+                oEmpleadoCLS.iidtipoContrato = (int)oEmpleado.IIDTIPOCONTRATO;
+                oEmpleadoCLS.iidSexo = (int)oEmpleado.IIDSEXO;
+            }
+            return View(oEmpleadoCLS);
+        }
+
+
+        //============================================================
 
         //PARA LLENAR TODOS LOS COMBOBOX
         //Creo todas las listas necesarias y las paso a la vista
