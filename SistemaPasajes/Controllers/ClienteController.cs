@@ -85,6 +85,7 @@ namespace SistemaPasajes.Controllers
             }
         }
 
+        //Para recuperar los datos y mostrarlos en pantalla
         public ActionResult Editar(int id)
         {
             ClienteCLS oClienteCLS = new ClienteCLS();
@@ -109,6 +110,47 @@ namespace SistemaPasajes.Controllers
                 oClienteCLS.telefonoFijo = oCLiente.TELEFONOFIJO;
             }
             return View(oClienteCLS);
+        }
+
+        //Para realizar la edicion en la base de datos
+        [HttpPost]
+        public ActionResult Editar(ClienteCLS oClienteCLS)
+        {
+            //int nregistradosEncontrados = 0;
+            int idcliente = oClienteCLS.iidcliente;
+            //string nombre = oClienteCLS.nombre;
+            //string apPaterno = oClienteCLS.apPaterno;
+            //string apMaterno = oClienteCLS.apMaterno;
+
+            //using (var bd = new BDPasajeEntities())
+            //{
+            //    nregistradosEncontrados = bd.Cliente.Where(p => p.NOMBRE.Equals(nombre) && p.APPATERNO.Equals(apPaterno)
+            //      && p.APMATERNO.Equals(apMaterno) && !p.IIDCLIENTE.Equals(idcliente)).Count();
+            //}
+
+            if (!ModelState.IsValid/* || nregistradosEncontrados >= 1*/)
+            {
+                //if (nregistradosEncontrados >= 1) oClienteCLS.mensajeError = "Ya existe el cliente";
+                llenarSexo(); //lleno la lista, para evitar errores
+                return View(oClienteCLS);
+            }
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busco el cliente por su ID, en la Base de Datos
+                Cliente oCliente = bd.Cliente.Where(p => p.IIDCLIENTE.Equals(idcliente)).First();
+                oCliente.NOMBRE = oClienteCLS.nombre;
+                oCliente.APPATERNO = oClienteCLS.apPaterno;
+                oCliente.APMATERNO = oClienteCLS.apMaterno;
+                oCliente.EMAIL = oClienteCLS.email;
+                oCliente.DIRECCION = oClienteCLS.direccion;
+                oCliente.IIDSEXO = oClienteCLS.iidsexo;
+                oCliente.TELEFONOCELULAR = oClienteCLS.telefonoCelular;
+                oCliente.TELEFONOFIJO = oClienteCLS.telefonoFijo;
+                bd.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

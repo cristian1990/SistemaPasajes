@@ -57,11 +57,11 @@
                 @Html.ValidationMessage("telefonoCelular", new { @class = "text-danger" })
             </div>
             <div style="margin:auto">
+                @Html.ActionLink("Regresar", "Index", "Cliente", null, new { @class = "btn btn-danger" })
                 <!-- Button trigger modal - Bootstrap -->
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                     Enviar
                 </button>
-                @Html.ActionLink("Regresar", "Index", "Cliente", null, new { @class = "btn btn-danger" })
             </div>
         }
     </div>
@@ -74,7 +74,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">¿Desea guardar los cambios?</h5>
+                <h5 class="modal-title" id="exampleModalLabel">¿Desea dar de alta al cliente?</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

@@ -92,6 +92,49 @@ namespace SistemaPasajes.Controllers
             return View(oEmpleadoCLS);
         }
 
+        [HttpPost]
+        public ActionResult Editar(EmpleadoCLS oEmpleadoCSL)
+        {
+            //int nregistrosAfectados = 0;
+            int idEmpleado = oEmpleadoCSL.iidEmpleado;
+            //string nombre = oEmpleadoCSL.nombre;
+            //string apPaterno = oEmpleadoCSL.apPaterno;
+            //string apMaterno = oEmpleadoCSL.apMaterno;
+
+            //using (var bd = new BDPasajeEntities())
+            //{
+            //    nregistrosAfectados = bd.Empleado.Where(
+            //      p => p.NOMBRE.Equals(nombre) && p.APPATERNO.Equals(apPaterno)
+            //      && p.APMATERNO.Equals(apMaterno) && !p.IIDEMPLEADO.Equals(idEmpleado)).Count();
+            //}
+
+            if (!ModelState.IsValid /*|| nregistrosAfectados >= 1*/)
+            {
+                //if (nregistrosAfectados >= 1) oEmpleadoCSL.mensajeError = "Ya existe el empleado";
+                listarCombos();
+                return View(oEmpleadoCSL);
+            }
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busco al empleado por ID en la base de datos
+                Empleado oEmpleado = bd.Empleado.Where(p => p.IIDEMPLEADO.Equals(idEmpleado)).First();
+                oEmpleado.NOMBRE = oEmpleadoCSL.nombre;
+                oEmpleado.APMATERNO = oEmpleadoCSL.apMaterno;
+                oEmpleado.APPATERNO = oEmpleadoCSL.apPaterno;
+                oEmpleado.NOMBRE = oEmpleadoCSL.nombre;
+                oEmpleado.FECHACONTRATO = oEmpleadoCSL.fechaContrato;
+                oEmpleado.SUELDO = oEmpleadoCSL.sueldo;
+                oEmpleado.NOMBRE = oEmpleadoCSL.nombre;
+                oEmpleado.IIDTIPOCONTRATO = oEmpleadoCSL.iidtipoContrato;
+                oEmpleado.IIDTIPOUSUARIO = oEmpleadoCSL.iidtipoUsuario;
+                oEmpleado.IIDSEXO = oEmpleadoCSL.iidSexo;
+
+                bd.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
 
         //============================================================
 
