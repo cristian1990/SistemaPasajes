@@ -10,7 +10,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        @using (Html.BeginForm("Agregar", "Cliente", FormMethod.Post, new { @id = "frmCliente" }))
+        @using (Html.BeginForm("Agregar", "Cliente", FormMethod.Post, new { @id = "frmAgregar" }))
         {
             <div>
                 @Html.LabelFor(p => p.nombre)
@@ -57,9 +57,43 @@
                 @Html.ValidationMessage("telefonoCelular", new { @class = "text-danger" })
             </div>
             <div style="margin:auto">
-                <input type="submit" class="btn btn-primary" value="Guardar" />
+                <!-- Button trigger modal - Bootstrap -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    Enviar
+                </button>
                 @Html.ActionLink("Regresar", "Index", "Cliente", null, new { @class = "btn btn-danger" })
             </div>
         }
     </div>
 </div>
+
+
+
+<!-- Modal - Bootstrap-->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Desea guardar los cambios?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="padding:1em">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnAceptar" class="btn btn-success">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var btnAceptar = document.getElementById("btnAceptar");
+
+    btnAceptar.addEventListener("click", function () {
+        var frmAgregar = document.getElementById("frmAgregar");
+        frmAgregar.submit();
+    });
+
+</script>

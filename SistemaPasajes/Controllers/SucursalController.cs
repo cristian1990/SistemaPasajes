@@ -56,6 +56,7 @@ namespace SistemaPasajes.Controllers
             return View(oSucursalCLS);
         }
 
+        //Para recuperar los datos y mostrarlos en pantalla
         public ActionResult Editar(int id) //El id, lo recibo de la vista Index
         {
             SucursalCLS oSucursalCLS = new SucursalCLS();
@@ -70,6 +71,37 @@ namespace SistemaPasajes.Controllers
                 oSucursalCLS.fechaApertura = (DateTime)oSucursal.FECHAAPERTURA;
             }
             return View(oSucursalCLS);
+        }
+
+        //Para realizar la edicion en la base de datos
+        [HttpPost]
+        public ActionResult Editar(SucursalCLS oSucursalCLS)
+        {
+            //int nregistrosAfectados = 0;
+            int idSucursal = oSucursalCLS.iidsucursal;
+            //string nombreSucursal = oSucursalCLS.nombre;
+            //using (var bd = new BDPasajeEntities())
+            //{
+            //    nregistrosAfectados = bd.Sucursal.Where(p => p.NOMBRE.Equals(nombreSucursal) && !p.IIDSUCURSAL.Equals(idSucursal)).Count();
+            //}
+            if (!ModelState.IsValid/* || nregistrosAfectados >= 1*/)
+            {
+                //if (nregistrosAfectados >= 1) oSucursalCLS.mensajeError = "Ya existe la sucursal";
+                return View(oSucursalCLS);
+            }
+
+            using (var bd = new BDPasajeEntities())
+            {
+                Sucursal oSucursal = bd.Sucursal.Where(p => p.IIDSUCURSAL.Equals(idSucursal)).First();
+                oSucursal.NOMBRE = oSucursalCLS.nombre;
+                oSucursal.DIRECCION = oSucursalCLS.direccion;
+                oSucursal.TELEFONO = oSucursalCLS.telefono;
+                oSucursal.EMAIL = oSucursalCLS.email;
+                oSucursal.FECHAAPERTURA = oSucursalCLS.fechaApertura;
+                bd.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

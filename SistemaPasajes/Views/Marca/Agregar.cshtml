@@ -40,7 +40,7 @@
     var frmAgregar = document.getElementById("frmAgregar");
     frmAgregar.onsubmit = function (e) { //Cuando se haga click en Submit
         e.preventDefault(); //Detengo la ejecucion por defecto
-        if (confirm("¿Deseas guardar los cambios?") == 1) { //Aceptar vale 1, Cancelar vale 0
+        if (confirm("¿Desea agregar realmente?") == 1) { //Aceptar vale 1, Cancelar vale 0
             frmAgregar.submit(); //Lo envio (Como si se hace click en el boton)
         }
     }
