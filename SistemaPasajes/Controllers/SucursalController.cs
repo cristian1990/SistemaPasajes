@@ -10,22 +10,43 @@ namespace SistemaPasajes.Controllers
     public class SucursalController : Controller
     {
         // GET: Sucursal
-        public ActionResult Index()
+        public ActionResult Index(SucursalCLS oSucursalCls)
         {
             List<SucursalCLS> listaSucursal = null;
+            string nombreSucursal = oSucursalCls.nombre;
+
             using (var bd = new BDPasajeEntities())
             {
-                //Utilizando LINQ
-                listaSucursal = (from s in bd.Sucursal
-                                 where s.BHABILITADO == 1
-                                 select new SucursalCLS
-                                 {
-                                     iidsucursal = s.IIDSUCURSAL,
-                                     nombre = s.NOMBRE,
-                                     telefono = s.TELEFONO,
-                                     email = s.EMAIL
-                                 }).ToList();
+                //Verifico si se ingreso un filtro de busqueda 
+                if (oSucursalCls.nombre == null) //si es null, es que no se ingreso nada
+                {
+                    //Si no se ingreso filtro, muestro todo
+                    //Utilizando LINQ
+                    listaSucursal = (from sucursal in bd.Sucursal
+                                     where sucursal.BHABILITADO == 1
+                                     select new SucursalCLS
+                                     {
+                                         iidsucursal = sucursal.IIDSUCURSAL,
+                                         nombre = sucursal.NOMBRE,
+                                         telefono = sucursal.TELEFONO,
+                                         email = sucursal.EMAIL
+                                     }).ToList();
+                }
+                else //Si se ingreso un nombre de Sucursal para filtrar...
+                { 
+                    listaSucursal = (from sucursal in bd.Sucursal
+                                     where sucursal.BHABILITADO == 1
+                                     && sucursal.NOMBRE.Contains(nombreSucursal) //Busco la sucursal que contenga lo ingresado
+                                     select new SucursalCLS
+                                     {
+                                         iidsucursal = sucursal.IIDSUCURSAL,
+                                         nombre = sucursal.NOMBRE,
+                                         telefono = sucursal.TELEFONO,
+                                         email = sucursal.EMAIL
+                                     }).ToList();
+                }
             }
+
             return View(listaSucursal);
         }
 

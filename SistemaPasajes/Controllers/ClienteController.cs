@@ -10,24 +10,48 @@ namespace SistemaPasajes.Controllers
     public class ClienteController : Controller
     {
         // GET: Cliente
-        public ActionResult Index()
+        public ActionResult Index(ClienteCLS oClienteCLS)
         {
-            List<ClienteCLS> listaClientes = null;
+            List<ClienteCLS> listaCliente = null;
+            int iidsexo = oClienteCLS.iidsexo; //Obtengo y almaceno lo ingresado
+            llenarSexo();
+
             using (var bd = new BDPasajeEntities())
             {
-                //Utilizando LINQ
-                listaClientes = (from c in bd.Cliente
-                                 where c.BHABILITADO == 1
-                                 select new ClienteCLS
-                                 {
-                                     iidcliente = c.IIDCLIENTE,
-                                     nombre = c.NOMBRE,                                   
-                                     apPaterno = c.APPATERNO,
-                                     apMaterno = c.APMATERNO,
-                                     telefonoFijo = c.TELEFONOFIJO
-                                 }).ToList();
+                //Verifico si se ingreso un sexo en busqueda
+                //Si no se ingreso nada en el Combobox, su valor sera 0
+                if (oClienteCLS.iidsexo == 0)
+                {
+                    //Si no se ingreso filtro, muestro todo
+                    //Utilizando LINQ
+                    listaCliente = (from cliente in bd.Cliente
+                                    where cliente.BHABILITADO == 1
+                                    select new ClienteCLS
+                                    {
+                                        iidcliente = cliente.IIDCLIENTE,
+                                        nombre = cliente.NOMBRE,
+                                        apPaterno = cliente.APPATERNO,
+                                        apMaterno = cliente.APMATERNO,
+                                        telefonoFijo = cliente.TELEFONOFIJO
+                                    }).ToList();
+                }
+                else //Si se ingreso un sexo para filtrar
+                {
+                    listaCliente = (from cliente in bd.Cliente
+                                    where cliente.BHABILITADO == 1
+                                    && cliente.IIDSEXO == iidsexo //Busco el sexo que tenga ese ID
+                                    select new ClienteCLS
+                                    {
+                                        iidcliente = cliente.IIDCLIENTE,
+                                        nombre = cliente.NOMBRE,
+                                        apPaterno = cliente.APPATERNO,
+                                        apMaterno = cliente.APMATERNO,
+                                        telefonoFijo = cliente.TELEFONOFIJO
+                                    }).ToList();
+                }
             }
-            return View(listaClientes);
+
+            return View(listaCliente);
         }
 
         public ActionResult Agregar()

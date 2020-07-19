@@ -3,42 +3,50 @@
 
 @{
     ViewBag.Title = "Index";
+    var listaTipoUsuario = (List<SelectListItem>)ViewBag.listaTipoUsuario;
 }
 
 <h2>Index</h2>
 @Html.ActionLink("Agregar", "Agregar", "Empleado", null, new { @class = "btn btn-primary" })
 
-<table class="table table-hover table-bordered" id="tablaEmpleado">
-    <thead>
-        <tr>
-            <td>@Html.LabelFor(p => Model[0].iidEmpleado)</td>
-            <td>@Html.LabelFor(p => Model[0].nombre)</td>
-            <td>@Html.LabelFor(p => Model[0].apPaterno)</td>
-            <td>@Html.LabelFor(p => Model[0].nombreTipoUsuario)</td>
-            <td>@Html.LabelFor(p => Model[0].nombreTipoContrato)</td>
-            <td>Operaciones</td>
-        </tr>
+<!--Para realizar una busqueda por Sexo, agrego el BeginForm-->
+@using (Html.BeginForm("Index", "Empleado", FormMethod.Get, new { @id = "frmBusqueda" }))
+{
+    @Html.Label("Ingresa el tipo de Usuario")
+    @Html.DropDownList("iidtipoUsuario", listaTipoUsuario) //Se debe llamar igual que la propiedad de la clase, "iidtipoUsuario"
+    <!--Fin-->
 
-    </thead>
-    <tbody>
-
-        @foreach (var item in Model)
-        {
+    <table class="table table-hover table-bordered" id="tablaEmpleado">
+        <thead>
             <tr>
-                <td>@item.iidEmpleado</td>
-                <td>@item.nombre</td>
-                <td>@item.apPaterno</td>
-                <td>@item.nombreTipoUsuario</td>
-                <td>@item.nombreTipoContrato</td>
-                <td>
-                    @Html.ActionLink(" ", "Editar", "Empleado", new { id = @item.iidEmpleado }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    <button type="button" onclick="ObtenerId(@item.iidEmpleado)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal"></button>
-                </td>
+                <td>@Html.LabelFor(p => Model[0].iidEmpleado)</td>
+                <td>@Html.LabelFor(p => Model[0].nombre)</td>
+                <td>@Html.LabelFor(p => Model[0].apPaterno)</td>
+                <td>@Html.LabelFor(p => Model[0].nombreTipoUsuario)</td>
+                <td>@Html.LabelFor(p => Model[0].nombreTipoContrato)</td>
+                <td>Operaciones</td>
             </tr>
-        }
-    </tbody>
-</table>
 
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.iidEmpleado</td>
+                    <td>@item.nombre</td>
+                    <td>@item.apPaterno</td>
+                    <td>@item.nombreTipoUsuario</td>
+                    <td>@item.nombreTipoContrato</td>
+                    <td>
+                        @Html.ActionLink(" ", "Editar", "Empleado", new { id = @item.iidEmpleado }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                        <button type="button" onclick="ObtenerId(@item.iidEmpleado)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal"></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 <!-- Modal - Bootstrap-->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -77,6 +85,14 @@
     function AceptarEliminar() {
         var frmEliminar = document.getElementById("frmEliminar");
         frmEliminar.submit();
+    }
+
+    //Funcion para filtrar el tipo de empleado
+    var iidtipoUsuario = document.getElementById("iidtipoUsuario"); //Obtengo el combobox
+    iidtipoUsuario.onchange = function () { //El evento onchange, se activa cuando hubo un cambio
+        //console.log("Probando el evento");
+        var frmBusqueda = document.getElementById("frmBusqueda");
+        frmBusqueda.submit(); //Envio el formulario
     }
 
 </script>

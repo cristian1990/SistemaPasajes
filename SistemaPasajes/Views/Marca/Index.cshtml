@@ -8,34 +8,42 @@
 <h2>Index</h2>
 @Html.ActionLink("Agregar", "Agregar", "Marca", null, new { @class = "btn btn-primary" })
 
-<table class="table table-bordered table-hover">
+<!--Para realizar una busqueda por Marca, agrego el BeginForm-->
+@using (Html.BeginForm("Index", "Marca", FormMethod.Post))
+{
+    @Html.Label("Ingrese Nombre Marca");
+    @Html.TextBox("nombre"); //Se debe llamar igual que la propiedad de la clase "nombre"
+    <input type="submit" class="btn  btn-success" value="Buscar" />
+    <!--Fin-->
 
-    <thead>
-        <tr>
-            <td width="10%">@Html.LabelFor(p => Model[0].iidmarca)</td>
-            <td width="20%">@Html.LabelFor(p => Model[0].nombre)</td>
-            <td width="60%">@Html.LabelFor(p => Model[0].descripcion)</td>
-            <td width="10%">Operaciones</td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <table class="table table-bordered table-hover">
+
+        <thead>
             <tr>
-                <td>@item.iidmarca</td>
-                <td>@item.nombre</td>
-                <td>@item.descripcion</td>
-                <td>
-                    <!--Paso el ID al controlador y agrego los botones de edit y delete-->
-                    @Html.ActionLink(" ", "Editar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    @Html.ActionLink(" ", "Eliminar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "Eliminar()" })
-                </td>
+                <td width="10%">@Html.LabelFor(p => Model[0].iidmarca)</td>
+                <td width="20%">@Html.LabelFor(p => Model[0].nombre)</td>
+                <td width="60%">@Html.LabelFor(p => Model[0].descripcion)</td>
+                <td width="10%">Operaciones</td>
             </tr>
-        }
-    </tbody>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.iidmarca</td>
+                    <td>@item.nombre</td>
+                    <td>@item.descripcion</td>
+                    <td>
+                        <!--Paso el ID al controlador y agrego los botones de edit y delete-->
+                        @Html.ActionLink(" ", "Editar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                        @Html.ActionLink(" ", "Eliminar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "Eliminar()" })
+                    </td>
+                </tr>
+            }
+        </tbody>
 
-</table>
-
+    </table>
+}
 
 
 <script>
@@ -47,7 +55,7 @@
         } else {
             //Click Cancelar
             //Detengo el comportamiento por defecto, no va hacia la accion Eliminar y no se borra
-            event.preventDefault(); 
+            event.preventDefault();
         }
     }
 

@@ -10,27 +10,58 @@ namespace SistemaPasajes.Controllers
     public class EmpleadoController : Controller
     {
         // GET: Empleado
-        public ActionResult Index()
+        public ActionResult Index(EmpleadoCLS oEmpleadoCls)
         {
-            List <EmpleadoCLS> listaEmpleados = null;
+            int idTipoUsuario = oEmpleadoCls.iidtipoUsuario; //Obtengo y almaceno lo ingresado
+            List<EmpleadoCLS> listaEmpleado = null;
+            listarTipoUsuario(); //Cargo los Combobox
+
             using (var bd = new BDPasajeEntities())
             {
-                listaEmpleados = (from empleado in bd.Empleado
-                                 join tipousuario in bd.TipoUsuario
-                                 on empleado.IIDTIPOUSUARIO equals tipousuario.IIDTIPOUSUARIO
-                                 join tipoContrato in bd.TipoContrato
-                                 on empleado.IIDTIPOCONTRATO equals tipoContrato.IIDTIPOCONTRATO
-                                 where empleado.BHABILITADO == 1
-                                 select new EmpleadoCLS
-                                 { //Para mostrar la info en pantalla
-                                     iidEmpleado = empleado.IIDEMPLEADO,
-                                     nombre = empleado.NOMBRE,
-                                     apPaterno = empleado.APPATERNO,
-                                     nombreTipoUsuario = tipousuario.NOMBRE,
-                                     nombreTipoContrato = tipoContrato.NOMBRE
-                                 }).ToList();
+                //Verifico si se ingreso un tipoEmpleado en busqueda
+                //Si no se ingreso nada en el Combobox, su valor sera 0
+                if (idTipoUsuario == 0)
+                {
+                    //Si no se ingreso filtro, muestro todo
+                    //Utilizando LINQ
+                    listaEmpleado = (from empleado in bd.Empleado
+                                     join tipousuario in bd.TipoUsuario
+                                     on empleado.IIDTIPOUSUARIO equals tipousuario.IIDTIPOUSUARIO
+                                     join tipoContrato in bd.TipoContrato
+                                     on empleado.IIDTIPOCONTRATO equals tipoContrato.IIDTIPOCONTRATO
+                                     where empleado.BHABILITADO == 1
+                                     select new EmpleadoCLS
+                                     {
+                                         iidEmpleado = empleado.IIDEMPLEADO,
+                                         nombre = empleado.NOMBRE,
+                                         apPaterno = empleado.APPATERNO,
+                                         nombreTipoUsuario = tipousuario.NOMBRE,
+                                         nombreTipoContrato = tipoContrato.NOMBRE
+                                     }).ToList();
+                }
+                else //Si se ingreso una marca para filtrar
+                {
+                    listaEmpleado = (from empleado in bd.Empleado
+                                     join tipousuario in bd.TipoUsuario
+                                     on empleado.IIDTIPOUSUARIO equals tipousuario.IIDTIPOUSUARIO
+                                     join tipoContrato in bd.TipoContrato
+                                     on empleado.IIDTIPOCONTRATO equals tipoContrato.IIDTIPOCONTRATO
+                                     where empleado.BHABILITADO == 1
+                                     && empleado.IIDTIPOUSUARIO == idTipoUsuario //Busco el tipoUsuario que tenga ese ID
+                                     select new EmpleadoCLS
+                                     {
+                                         //Para mostrar info en pantalla
+                                         iidEmpleado = empleado.IIDEMPLEADO,
+                                         nombre = empleado.NOMBRE,
+                                         apPaterno = empleado.APPATERNO,
+                                         nombreTipoUsuario = tipousuario.NOMBRE,
+                                         nombreTipoContrato = tipoContrato.NOMBRE
+                                     }).ToList();
+                }
+
             }
-                return View(listaEmpleados);
+
+            return View(listaEmpleado);
         }
 
         public ActionResult Agregar() 

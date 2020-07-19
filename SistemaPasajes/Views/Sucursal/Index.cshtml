@@ -8,34 +8,40 @@
 <h2>Index</h2>
 @Html.ActionLink("Agregar", "Agregar", "Sucursal", null, new { @class = "btn btn-primary" })
 
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <td>@Html.LabelFor(p => Model[0].iidsucursal)</td>
-            <td>@Html.LabelFor(p => Model[0].nombre)</td>
-            <td>@Html.LabelFor(p => Model[0].telefono)</td>
-            <td>@Html.LabelFor(p => Model[0].email)</td>
-            <td>Operaciones</td>
-        </tr>
-
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<!--Para realizar una busqueda por Sucursal, agrego el BeginForm-->
+@using (Html.BeginForm("Index", "Sucursal", FormMethod.Get, new { @id = "frmBusqueda" }))
+{
+    @Html.Label("Ingrese nombre sucursal")
+    @Html.TextBox("nombre") //Se debe llamar igual que la propiedad "nombre"
+    <!--Fin-->
+    <table class="table table-bordered table-hover">
+        <thead>
             <tr>
-                <td>@item.iidsucursal</td>
-                <td>@item.nombre</td>
-                <td>@item.telefono</td>
-                <td>@item.email</td>
-                <td>
-                    @Html.ActionLink(" ", "Editar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    @Html.ActionLink(" ", "Eliminar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "EliminarSucursal()" })
-                </td>
+                <td>@Html.LabelFor(p => Model[0].iidsucursal)</td>
+                <td>@Html.LabelFor(p => Model[0].nombre)</td>
+                <td>@Html.LabelFor(p => Model[0].telefono)</td>
+                <td>@Html.LabelFor(p => Model[0].email)</td>
+                <td>Operaciones</td>
             </tr>
-        }
-    </tbody>
-</table>
 
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.iidsucursal</td>
+                    <td>@item.nombre</td>
+                    <td>@item.telefono</td>
+                    <td>@item.email</td>
+                    <td>
+                        @Html.ActionLink(" ", "Editar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                        @Html.ActionLink(" ", "Eliminar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "EliminarSucursal()" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 <script>
 
@@ -48,6 +54,15 @@
             //Detengo el comportamiento por defecto, no va hacia la accion Eliminar y no se borra
             event.preventDefault();
         }
+    }
+
+    //Funcion para realizar la busqueda
+    var nombre = document.getElementById("nombre"); //Capturo el Textbox
+    //El evento keyup se lanza cuando el usuario suelta la tecla que ha sido presionada.
+    nombre.onkeyup = function () { 
+        //console.log("Tocando textbox");
+        var frmBusqueda = document.getElementById("frmBusqueda");
+        frmBusqueda.submit(); //Se envia el formulario
     }
 
 </script>

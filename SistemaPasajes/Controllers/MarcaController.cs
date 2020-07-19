@@ -12,20 +12,41 @@ namespace SistemaPasajes.Controllers
     {
         #region Accion para Listar Datos
         // GET: Marca
-        public ActionResult Index()
+        public ActionResult Index(MarcaCLS omarcaCLS)
         {
+            string nombreMarca = omarcaCLS.nombre; //Obtengo y almaceno lo ingresado
             List<MarcaCLS> listaMarca = null;
+
             using (var bd = new BDPasajeEntities())
             {
-                //Utilizando LINQ
-                listaMarca = (from m in bd.Marca
-                              where m.BHABILITADO == 1
-                              select new MarcaCLS
-                              {
-                                  iidmarca = m.IIDMARCA,
-                                  nombre = m.NOMBRE,
-                                  descripcion = m.DESCRIPCION
-                              }).ToList();
+                //Verifico si se ingreso un filtro de busqueda 
+                if (omarcaCLS.nombre == null) //si es null, es que no se ingreso nada
+                {
+                    //Si no se ingreso filtro, muestro todo
+                    //Utilizando LINQ
+                    listaMarca = (from marca in bd.Marca
+                                  where marca.BHABILITADO == 1
+                                  select new MarcaCLS
+                                  {
+                                      iidmarca = marca.IIDMARCA,
+                                      nombre = marca.NOMBRE,
+                                      descripcion = marca.DESCRIPCION
+                                  }).ToList();
+                    //Session["lista"] = listaMarca;
+                }
+                else //Si se ingreso una marca para filtrar
+                {
+                    listaMarca = (from marca in bd.Marca
+                                  where marca.BHABILITADO == 1
+                                  && marca.NOMBRE.Contains(nombreMarca) //Busco la marca que contenga lo ingresado
+                                  select new MarcaCLS
+                                  {
+                                      iidmarca = marca.IIDMARCA,
+                                      nombre = marca.NOMBRE,
+                                      descripcion = marca.DESCRIPCION
+                                  }).ToList();
+                    //Session["lista"] = listaMarca;
+                }
             }
             return View(listaMarca);
         }

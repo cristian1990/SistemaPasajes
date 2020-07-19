@@ -3,39 +3,49 @@
 
 @{
     ViewBag.Title = "Index";
+    var listaSexo = (List<SelectListItem>)ViewBag.lista; //Casteamos la lista
 }
 
 <h2>Index</h2>
 @Html.ActionLink("Agregar", "Agregar", "Cliente", null, new { @class = "btn btn-primary" })
 
-<table class="table table-bordered table-hover" id="tablaCliente">
-    <thead>
-        <tr>
-            <td>@Html.LabelFor(p => Model[0].iidcliente)</td>
-            <td>@Html.LabelFor(p => Model[0].nombre)</td>
-            <td>@Html.LabelFor(p => Model[0].apPaterno)</td>
-            <td>@Html.LabelFor(p => Model[0].apMaterno)</td>
-            <td>@Html.LabelFor(p => Model[0].telefonoFijo)</td>
-            <td>Operaciones</td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<!--Para realizar una busqueda por Sexo, agrego el BeginForm-->
+@using (Html.BeginForm("Index", "Cliente", FormMethod.Get))
+{
+    @Html.Label("Ingrese sexo del cliente")
+    @Html.DropDownList("iidsexo", listaSexo) //Se debe llamar igual que la propiedad de la clase, "iidsexo"
+    <input type="submit" value="Buscar" class="btn btn-success" />
+    <!--Fin-->
+
+    <table class="table table-bordered table-hover" id="tablaCliente">
+        <thead>
             <tr>
-                <td>@item.iidcliente</td>
-                <td>@item.nombre</td>
-                <td>@item.apPaterno</td>
-                <td>@item.apMaterno</td>
-                <td>@item.telefonoFijo</td>
-                <td>
-                    @Html.ActionLink(" ", "Editar", "Cliente", new { id = @item.iidcliente }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    <button type="button" onclick="ObtenerId(@item.iidcliente)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal"></button>
-                </td>
+                <td>@Html.LabelFor(p => Model[0].iidcliente)</td>
+                <td>@Html.LabelFor(p => Model[0].nombre)</td>
+                <td>@Html.LabelFor(p => Model[0].apPaterno)</td>
+                <td>@Html.LabelFor(p => Model[0].apMaterno)</td>
+                <td>@Html.LabelFor(p => Model[0].telefonoFijo)</td>
+                <td>Operaciones</td>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.iidcliente</td>
+                    <td>@item.nombre</td>
+                    <td>@item.apPaterno</td>
+                    <td>@item.apMaterno</td>
+                    <td>@item.telefonoFijo</td>
+                    <td>
+                        @Html.ActionLink(" ", "Editar", "Cliente", new { id = @item.iidcliente }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                        <button type="button" onclick="ObtenerId(@item.iidcliente)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal"></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @using (Html.BeginForm("Eliminar", "Cliente", FormMethod.Post, new { @id = "frmEliminar" }))
 {
