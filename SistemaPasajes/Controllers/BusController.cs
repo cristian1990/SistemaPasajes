@@ -47,34 +47,53 @@ namespace SistemaPasajes.Controllers
         }
 
         [HttpPost]
-        public ActionResult Agregar(BusCLS oBusClS)
+        public ActionResult Agregar(BusCLS oBusCls)
         {
-            if (ModelState.IsValid)
+            //VALIDAR PLACA
+            int nregistrosEncontrados = 0;
+            string placa = oBusCls.placa;
+
+            using (var bd = new BDPasajeEntities())
             {
-                using (var bd = new BDPasajeEntities())
-                {
-                    Bus oBus = new Bus();
-                    oBus.IIDSUCURSAL = oBusClS.iidSucursal;
-                    oBus.IIDTIPOBUS = oBusClS.iidTipoBus;
-                    oBus.PLACA = oBusClS.placa;
-                    oBus.FECHACOMPRA = oBusClS.fechaCompra;
-                    oBus.IIDMODELO = oBusClS.iidModelo;
-                    oBus.NUMEROFILAS = oBusClS.numeroFilas;
-                    oBus.NUMEROCOLUMNAS = oBusClS.numeroColumnas;
-                    oBus.DESCRIPCION = oBusClS.descripcion;
-                    oBus.OBSERVACION = oBusClS.observacion;
-                    oBus.IIDMARCA = oBusClS.iidmarca;
-                    oBus.BHABILITADO = 1;
-                    bd.Bus.Add(oBus);
-                    bd.SaveChanges();
-                }
-                return RedirectToAction("Index");
+                //Verifico la cantidad de Bus con la misma placa
+                nregistrosEncontrados = bd.Bus.Where(p => p.PLACA.Equals(placa)).Count();
+            }
+            //FIN
+
+            if (!ModelState.IsValid || nregistrosEncontrados >= 1)
+            {
+                if (nregistrosEncontrados >= 1) 
+                    oBusCls.mensajeError = "Ya existe el bus";
+                
+                listarCombos();
+                return View(oBusCls);
             }
 
-            listarCombos();
-            return View(oBusClS);
+            //Si no el ModelState es valido y la placa no existe, agrego en la BD
+            using (var bd = new BDPasajeEntities())
+            {
+                Bus oBus = new Bus();
+                oBus.IIDSUCURSAL = oBusCls.iidSucursal;
+                oBus.IIDTIPOBUS = oBusCls.iidTipoBus;
+                oBus.PLACA = oBusCls.placa;
+                oBus.FECHACOMPRA = oBusCls.fechaCompra;
+                oBus.IIDMODELO = oBusCls.iidModelo;
+                oBus.NUMEROFILAS = oBusCls.numeroFilas;
+                oBus.NUMEROCOLUMNAS = oBusCls.numeroColumnas;
+                oBus.DESCRIPCION = oBusCls.descripcion;
+                oBus.OBSERVACION = oBusCls.observacion;
+                oBus.IIDMARCA = oBusCls.iidmarca;
+                oBus.BHABILITADO = 1;
+                bd.Bus.Add(oBus);
+
+                bd.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
         }
 
+        //El id, lo pasamos desde la vista
+        //Para recuperar los datos y mostrarlos en pantalla
         public ActionResult Editar(int id)
         {
             //Listo a la info de los ComboBox, necesario para poder editar
@@ -96,6 +115,66 @@ namespace SistemaPasajes.Controllers
                 oBusCls.iidmarca = (int)obus.IIDMARCA;
             }
             return View(oBusCls);
+        }
+
+        //Para realizar la edicion en la base de datos
+        [HttpPost]
+        public ActionResult Editar(BusCLS oBusCLS)
+        {
+            int nregistrosEncontrados = 0;
+            int idBus = oBusCLS.iidBus;
+            string placa = oBusCLS.placa;
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Verifico la cantidad de placas, con un ID distinto
+                nregistrosEncontrados = bd.Bus.Where(p => p.PLACA.Equals(placa) && !p.IIDBUS.Equals(idBus)).Count();
+            }
+
+            if (!ModelState.IsValid || nregistrosEncontrados >= 1)
+            {
+                if (nregistrosEncontrados >= 1)
+                    oBusCLS.mensajeError = "El bus ya existe";
+
+                listarCombos();
+                return View(oBusCLS);
+            }
+
+            //Si no el ModelState es valido y la placa no existe, agrego en la BD
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busco el Bus por su ID en la base de datos
+                Bus oBus = bd.Bus.Where(p => p.IIDBUS.Equals(idBus)).First();
+                oBus.IIDSUCURSAL = oBusCLS.iidSucursal;
+                oBus.IIDTIPOBUS = oBusCLS.iidTipoBus;
+                oBus.PLACA = oBusCLS.placa;
+                oBus.FECHACOMPRA = oBusCLS.fechaCompra;
+                oBus.IIDMODELO = oBusCLS.iidModelo;
+                oBus.NUMEROCOLUMNAS = oBusCLS.numeroColumnas;
+                oBus.NUMEROFILAS = oBusCLS.numeroFilas;
+                oBus.DESCRIPCION = oBusCLS.descripcion;
+                oBus.OBSERVACION = oBusCLS.observacion;
+                oBus.IIDMARCA = oBusCLS.iidmarca;
+
+                bd.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public ActionResult Eliminar(int idBus)
+        {
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busco el Bus en la BD, por su ID
+                Bus oBus = bd.Bus.Where(p => p.IIDBUS.Equals(idBus)).First();
+                oBus.BHABILITADO = 0;
+                bd.SaveChanges();
+
+            }
+            return RedirectToAction("Index");
         }
 
         //============================================================

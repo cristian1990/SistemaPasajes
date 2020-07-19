@@ -37,23 +37,38 @@ namespace SistemaPasajes.Controllers
         [HttpPost]
         public ActionResult Agregar(SucursalCLS oSucursalCLS)
         {
-            if (ModelState.IsValid)
+            //VALIDAR EL NOMBRE DE LA SUCURSAL
+            int nregistrosEncontrados = 0;
+            string nombreSucursal = oSucursalCLS.nombre;
+
+            using (var bd = new BDPasajeEntities())
             {
-                using (var bd = new BDPasajeEntities())
-                {
-                    Sucursal oSucursal = new Sucursal();
-                    oSucursal.NOMBRE = oSucursalCLS.nombre;
-                    oSucursal.DIRECCION = oSucursalCLS.direccion;
-                    oSucursal.TELEFONO = oSucursalCLS.telefono;
-                    oSucursal.EMAIL = oSucursalCLS.email;
-                    oSucursal.FECHAAPERTURA = oSucursalCLS.fechaApertura;
-                    oSucursal.BHABILITADO = 1;
-                    bd.Sucursal.Add(oSucursal);
-                    bd.SaveChanges();
-                }
-                return RedirectToAction("Index");
+                nregistrosEncontrados = bd.Sucursal.Where(p => p.NOMBRE.Equals(nombreSucursal)).Count();
             }
-            return View(oSucursalCLS);
+            //FIN
+
+            if (!ModelState.IsValid || nregistrosEncontrados >= 1)
+            {
+                if (nregistrosEncontrados >= 1) 
+                    oSucursalCLS.mensajeError = "Ya existe la sucursal a ingresar";
+
+                return View(oSucursalCLS);
+            }
+
+            //Si el ModelState es valido y el nombre de la Sucursal no se repite, guardamos en BD
+            using (var bd = new BDPasajeEntities())
+            {
+                Sucursal oSucursal = new Sucursal();
+                oSucursal.NOMBRE = oSucursalCLS.nombre;
+                oSucursal.DIRECCION = oSucursalCLS.direccion;
+                oSucursal.TELEFONO = oSucursalCLS.telefono;
+                oSucursal.EMAIL = oSucursalCLS.email;
+                oSucursal.FECHAAPERTURA = oSucursalCLS.fechaApertura;
+                oSucursal.BHABILITADO = 1;
+                bd.Sucursal.Add(oSucursal);
+                bd.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
 
         //Para recuperar los datos y mostrarlos en pantalla
@@ -77,16 +92,19 @@ namespace SistemaPasajes.Controllers
         [HttpPost]
         public ActionResult Editar(SucursalCLS oSucursalCLS)
         {
-            //int nregistrosAfectados = 0;
+            int nregistrosAfectados = 0;
             int idSucursal = oSucursalCLS.iidsucursal;
-            //string nombreSucursal = oSucursalCLS.nombre;
-            //using (var bd = new BDPasajeEntities())
-            //{
-            //    nregistrosAfectados = bd.Sucursal.Where(p => p.NOMBRE.Equals(nombreSucursal) && !p.IIDSUCURSAL.Equals(idSucursal)).Count();
-            //}
-            if (!ModelState.IsValid/* || nregistrosAfectados >= 1*/)
+            string nombreSucursal = oSucursalCLS.nombre;
+
+            using (var bd = new BDPasajeEntities())
             {
-                //if (nregistrosAfectados >= 1) oSucursalCLS.mensajeError = "Ya existe la sucursal";
+                //Buscamos la cantidad de registros en la base con el mismo nombre y distinto ID
+                nregistrosAfectados = bd.Sucursal.Where(p => p.NOMBRE.Equals(nombreSucursal) && !p.IIDSUCURSAL.Equals(idSucursal)).Count();
+            }
+            
+            if (!ModelState.IsValid || nregistrosAfectados >= 1)
+            {
+                if (nregistrosAfectados >= 1) oSucursalCLS.mensajeError = "Ya existe la sucursal";
                 return View(oSucursalCLS);
             }
 
@@ -98,6 +116,19 @@ namespace SistemaPasajes.Controllers
                 oSucursal.TELEFONO = oSucursalCLS.telefono;
                 oSucursal.EMAIL = oSucursalCLS.email;
                 oSucursal.FECHAAPERTURA = oSucursalCLS.fechaApertura;
+                bd.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Eliminar(int id) //Recibo el ID de la vista
+        {
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busco la sucursal por su ID y la almaceno
+                Sucursal oSucursal = bd.Sucursal.Where(p => p.IIDSUCURSAL.Equals(id)).First();
+                oSucursal.BHABILITADO = 0;
                 bd.SaveChanges();
             }
 

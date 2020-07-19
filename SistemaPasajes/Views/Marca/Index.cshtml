@@ -6,7 +6,7 @@
 }
 
 <h2>Index</h2>
-@Html.ActionLink("Agregar", "Agregar", "Marca",null ,new { @class = "btn btn-primary" })
+@Html.ActionLink("Agregar", "Agregar", "Marca", null, new { @class = "btn btn-primary" })
 
 <table class="table table-bordered table-hover">
 
@@ -28,10 +28,27 @@
                 <td>
                     <!--Paso el ID al controlador y agrego los botones de edit y delete-->
                     @Html.ActionLink(" ", "Editar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    @Html.ActionLink(" ", "Eliminar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "eliminar()" })
+                    @Html.ActionLink(" ", "Eliminar", "Marca", new { id = @item.iidmarca }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "Eliminar()" })
                 </td>
             </tr>
         }
     </tbody>
 
 </table>
+
+
+
+<script>
+
+    function Eliminar() {
+        if (confirm("¿Deseas eliminar el registro?") == 1) { //Aceptar vale 1, Cancelar vale 0
+            //Click Aceptar
+            alert("Se elimino correctamente");
+        } else {
+            //Click Cancelar
+            //Detengo el comportamiento por defecto, no va hacia la accion Eliminar y no se borra
+            event.preventDefault(); 
+        }
+    }
+
+</script>

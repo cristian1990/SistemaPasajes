@@ -51,11 +51,11 @@ namespace SistemaPasajes.Models
         [Display(Name = "Sueldo")]
         public decimal sueldo { get; set; }
 
-        public string mensajeError { get; set; }
-
-        /////Propiedades adicionales (para los JOIN)
+        //Propiedades adicionales (para los JOIN) y Mensaje error
         public string nombreTipoContrato { get; set; }
         [Display(Name = "Tipo Usuario")]
         public string nombreTipoUsuario { get; set; }
+
+        public string mensajeError { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace SistemaPasajes.Controllers
 {
     public class MarcaController : Controller
     {
+        #region Accion para Listar Datos
         // GET: Marca
         public ActionResult Index()
         {
@@ -29,6 +30,9 @@ namespace SistemaPasajes.Controllers
             return View(listaMarca);
         }
 
+        #endregion
+
+        #region Acciones para Agregar
         public ActionResult Agregar()
         {
             return View();
@@ -37,7 +41,25 @@ namespace SistemaPasajes.Controllers
         [HttpPost]
         public ActionResult Agregar(MarcaCLS oMarcaCLS)
         {
-            if (ModelState.IsValid)
+            //PARA VALIDAR LA MARCA
+            int nregistrosEncontrados = 0;
+            string nombreMarca = oMarcaCLS.nombre; 
+            using (var bd = new BDPasajeEntities())
+            {
+                //Vefifico cuantas veces se repite la marca en la base de datos
+                nregistrosEncontrados = bd.Marca.Where(p => p.NOMBRE.Equals(nombreMarca)).Count();
+            }
+            //FIN
+
+            //Si el ModelState no es valido o ya existe la marca 
+            if (!ModelState.IsValid || nregistrosEncontrados >= 1)
+            {
+                if (nregistrosEncontrados >= 1) 
+                    oMarcaCLS.mensajeError = "El nombre marca ya existe"; //Se debe agregar un if en la vista.
+
+                return View(oMarcaCLS); //Retorno la vista, para que quede lo que ingreso hasta el momento 
+            }
+            else //Si la marca no existe, cargo los datos en la base
             {
                 using (var bd = new BDPasajeEntities())
                 {
@@ -48,10 +70,14 @@ namespace SistemaPasajes.Controllers
                     bd.Marca.Add(oMarca);
                     bd.SaveChanges();
                 }
-                return RedirectToAction("Index");
             }
-            return View(oMarcaCLS);
+
+            return RedirectToAction("Index");
         }
+
+        #endregion
+
+        #region Acciones para Editar
 
         //El id, lo pasamos desde la vista
         //Para recuperar los datos y mostrarlos en pantalla
@@ -75,21 +101,28 @@ namespace SistemaPasajes.Controllers
         [HttpPost]
         public ActionResult Editar(MarcaCLS oMarcaCLS)
         {
-            //int nregistradosEncontrados = 0;
-            //string nombreMarca = oMarcaCLS.nombre;
-            //int iidmarca = oMarcaCLS.iidmarca;
-            //using (var bd = new BDPasajeEntities())
-            //{
+            //PARA VALIDAR LA MARCA
+            int nregistradosEncontrados = 0;
+            string nombreMarca = oMarcaCLS.nombre;
+            int iidmarca = oMarcaCLS.iidmarca;
 
-            //    nregistradosEncontrados = bd.Marca.Where(p => p.NOMBRE.Equals(nombreMarca) && !p.IIDMARCA.Equals(iidmarca)).Count();
-            //}
-
-            if (!ModelState.IsValid /*|| nregistradosEncontrados >= 1*/)
+            using (var bd = new BDPasajeEntities())
             {
-                //if (nregistradosEncontrados >= 1) oMarcaCLS.mensajeError = "Ya se encuentra registrada la marca";
-                return View(oMarcaCLS);
+                //Busco la cantidad de registro encontrados en la base de datos, donde el nombre sea igual y el ID sea distinto
+                nregistradosEncontrados = bd.Marca.Where(p => p.NOMBRE.Equals(nombreMarca) && !p.IIDMARCA.Equals(iidmarca)).Count();
+            }
+            //FIN
+
+            //Si el ModelState no es valido o ya existe la marca 
+            if (!ModelState.IsValid || nregistradosEncontrados >= 1)
+            {
+                if (nregistradosEncontrados >= 1) 
+                    oMarcaCLS.mensajeError = "Ya se encuentra registrada la marca"; //Se debe agregar un if en la vista.
+
+                return View(oMarcaCLS); //Retorno la vista, para que quede lo que ingreso hasta el momento 
             }
 
+            //Si la marca no existe, cargo los datos en la base
             int idMarca = oMarcaCLS.iidmarca;
             using (var bd = new BDPasajeEntities())
             {
@@ -102,5 +135,22 @@ namespace SistemaPasajes.Controllers
 
             return RedirectToAction("Index");
         }
+
+        #endregion
+
+        #region Acciones para Eliminar
+        //El ID, lo recibo de la vista Index, hacemos una Eliminacion Logica
+        public ActionResult Eliminar(int id)
+        {
+            using (var bd = new BDPasajeEntities())
+            {
+                //Busco la Marca en la base, mediante el Id pasado
+                Marca oMarca = bd.Marca.Where(p => p.IIDMARCA.Equals(id)).First();
+                oMarca.BHABILITADO = 0;
+                bd.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+        #endregion
     }
 }

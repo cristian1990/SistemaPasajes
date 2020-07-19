@@ -53,5 +53,8 @@ namespace SistemaPasajes.Models
         public string telefonoCelular { get; set; }
 
         public int bhabilitado { get; set; }
+
+        //Propiedad adicional
+        public string mensajeError { get; set; }
     }
 }

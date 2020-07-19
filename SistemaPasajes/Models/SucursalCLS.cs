@@ -39,5 +39,8 @@ namespace SistemaPasajes.Models
         public DateTime fechaApertura { get; set; }
 
         public int bhabilitado { get; set; }
+
+        //Propiedad adicional para mostrar mensaje de error
+        public string mensajeError { get; set; }
     }
 }

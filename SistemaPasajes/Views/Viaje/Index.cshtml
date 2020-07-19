@@ -6,6 +6,7 @@
 }
 
 <h2>Index</h2>
+@Html.ActionLink("Agregar", "Agregar", "Viaje", null, new { @class = "btn btn-primary" })
 
 <table class="table table-bordered table-hover">
 
@@ -25,11 +26,13 @@
             <td>@item.nombreLugarDestino</td>
             <td>@item.nombreBus</td>
             <td>
-                <button type="button" onclick="Editar(@item.iidViaje)" class="btn btn-primary glyphicon glyphicon-edit" data-toggle="modal" data-target="#exampleModal"></button>
-                <button type="button" onclick="Eliminar(@item.iidViaje)" class="btn btn-danger glyphicon glyphicon-trash" data-toggle="modal" data-target="#exampleModalConfirmacion"></button>
+                @Html.ActionLink(" ", "Editar", "Viaje", new { id = @item.iidViaje }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                @Html.ActionLink(" ", "Eliminar", "Viaje", new { id = @item.iidViaje }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "eliminarSucursal()" })
             </td>
-
+            @*<td>
+                    <button type="button" onclick="Editar(@item.iidViaje)" class="btn btn-primary glyphicon glyphicon-edit" data-toggle="modal" data-target="#exampleModal"></button>
+                    <button type="button" onclick="Eliminar(@item.iidViaje)" class="btn btn-danger glyphicon glyphicon-trash" data-toggle="modal" data-target="#exampleModalConfirmacion"></button>
+                </td>*@
         </tr>
     }
-
 </table>

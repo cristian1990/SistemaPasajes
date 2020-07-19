@@ -42,30 +42,49 @@ namespace SistemaPasajes.Controllers
         [HttpPost]
         public ActionResult Agregar(EmpleadoCLS oEmpleadoCLS)
         {
-            if (ModelState.IsValid)
-            {
-                using (var bd = new BDPasajeEntities())
-                {
-                    Empleado oEmpleado = new Empleado(); //Empleado de EF
-                    oEmpleado.NOMBRE = oEmpleadoCLS.nombre;
-                    oEmpleado.APPATERNO = oEmpleadoCLS.apPaterno;
-                    oEmpleado.APMATERNO = oEmpleadoCLS.apMaterno;
-                    oEmpleado.FECHACONTRATO = oEmpleadoCLS.fechaContrato;
-                    oEmpleado.SUELDO = oEmpleadoCLS.sueldo;
-                    oEmpleado.IIDTIPOUSUARIO = oEmpleadoCLS.iidtipoUsuario;
-                    oEmpleado.IIDTIPOCONTRATO = oEmpleadoCLS.iidtipoContrato;
-                    oEmpleado.IIDSEXO = oEmpleadoCLS.iidSexo;
-                    oEmpleado.BHABILITADO = 1;
+            //VALIDAR NOMBRE Y APELLIDOS
+            int nregistrosAfectados = 0;
+            string nombre = oEmpleadoCLS.nombre;
+            string apPaterno = oEmpleadoCLS.apPaterno;
+            string apMaterno = oEmpleadoCLS.apMaterno;
 
-                    bd.Empleado.Add(oEmpleado);
-                    bd.SaveChanges();
-                }
-                return RedirectToAction("Index");
+            using (var bd = new BDPasajeEntities())
+            {
+                //Verificamos la cantidad de empleados con mismo nombre y apellidos
+                nregistrosAfectados = bd.Empleado.Where(
+                    p => p.NOMBRE.Equals(nombre) && p.APPATERNO.Equals(apPaterno)
+                    && p.APMATERNO.Equals(apMaterno)).Count();
+            }
+            //FIN 
+
+            if (!ModelState.IsValid || nregistrosAfectados >= 1)
+            {
+                if (nregistrosAfectados >= 1) 
+                    oEmpleadoCLS.mensajeError = "El empleado ya existe";
+                
+                listarCombos(); //Debo cargar los Combobox si el modelState no es valido para evitar un error
+                return View(oEmpleadoCLS);
             }
 
-            //Debo cargar los Combobox si el modelState no es valido para evitar un error
-            listarCombos();
-            return View(oEmpleadoCLS);
+            //Si el ModelState es valido y no existe el empleado, lo agregamos a la BD
+            using (var bd = new BDPasajeEntities())
+            {
+                Empleado oEmpleado = new Empleado();
+                oEmpleado.NOMBRE = oEmpleadoCLS.nombre;
+                oEmpleado.APPATERNO = oEmpleadoCLS.apPaterno;
+                oEmpleado.APMATERNO = oEmpleadoCLS.apMaterno;
+                oEmpleado.FECHACONTRATO = oEmpleadoCLS.fechaContrato;
+                oEmpleado.SUELDO = oEmpleadoCLS.sueldo;
+                oEmpleado.IIDTIPOUSUARIO = oEmpleadoCLS.iidtipoUsuario;
+                oEmpleado.IIDTIPOCONTRATO = oEmpleadoCLS.iidtipoContrato;
+                oEmpleado.IIDSEXO = oEmpleadoCLS.iidSexo;
+                oEmpleado.BHABILITADO = 1;
+
+                bd.Empleado.Add(oEmpleado);
+                bd.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult Editar(int id)
@@ -95,26 +114,32 @@ namespace SistemaPasajes.Controllers
         [HttpPost]
         public ActionResult Editar(EmpleadoCLS oEmpleadoCSL)
         {
-            //int nregistrosAfectados = 0;
+            //VALIDAR NOMBRE Y APELLIDOS
+            int nregistrosAfectados = 0;
             int idEmpleado = oEmpleadoCSL.iidEmpleado;
-            //string nombre = oEmpleadoCSL.nombre;
-            //string apPaterno = oEmpleadoCSL.apPaterno;
-            //string apMaterno = oEmpleadoCSL.apMaterno;
+            string nombre = oEmpleadoCSL.nombre;
+            string apPaterno = oEmpleadoCSL.apPaterno;
+            string apMaterno = oEmpleadoCSL.apMaterno;
 
-            //using (var bd = new BDPasajeEntities())
-            //{
-            //    nregistrosAfectados = bd.Empleado.Where(
-            //      p => p.NOMBRE.Equals(nombre) && p.APPATERNO.Equals(apPaterno)
-            //      && p.APMATERNO.Equals(apMaterno) && !p.IIDEMPLEADO.Equals(idEmpleado)).Count();
-            //}
-
-            if (!ModelState.IsValid /*|| nregistrosAfectados >= 1*/)
+            using (var bd = new BDPasajeEntities())
             {
-                //if (nregistrosAfectados >= 1) oEmpleadoCSL.mensajeError = "Ya existe el empleado";
+                //Buscamos la cantidad de empleados con los mismos datos pero con distinto ID
+                nregistrosAfectados = bd.Empleado.Where(
+                  p => p.NOMBRE.Equals(nombre) && p.APPATERNO.Equals(apPaterno)
+                  && p.APMATERNO.Equals(apMaterno) && !p.IIDEMPLEADO.Equals(idEmpleado)).Count();
+            }
+            //FIN
+
+            if (!ModelState.IsValid || nregistrosAfectados >= 1)
+            {
+                if (nregistrosAfectados >= 1) 
+                    oEmpleadoCSL.mensajeError = "Ya existe el empleado";
+                
                 listarCombos();
                 return View(oEmpleadoCSL);
             }
 
+            //Si el ModelState es valido y el empleado no existe, lo agrego a la BD
             using (var bd = new BDPasajeEntities())
             {
                 //Busco al empleado por ID en la base de datos
@@ -130,6 +155,21 @@ namespace SistemaPasajes.Controllers
                 oEmpleado.IIDTIPOUSUARIO = oEmpleadoCSL.iidtipoUsuario;
                 oEmpleado.IIDSEXO = oEmpleadoCSL.iidSexo;
 
+                bd.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+        //Eliminacion logica
+        [HttpPost]
+        public ActionResult Eliminar(int idEmpleado)
+        {
+
+            using (var bd = new BDPasajeEntities())
+            {
+                //Buscamos al empleado en la Base, mediante el ID
+                Empleado emp = bd.Empleado.Where(p => p.IIDEMPLEADO.Equals(idEmpleado)).First();
+                emp.BHABILITADO = 0;
                 bd.SaveChanges();
             }
             return RedirectToAction("Index");

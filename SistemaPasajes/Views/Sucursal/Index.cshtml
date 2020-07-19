@@ -29,10 +29,25 @@
                 <td>@item.email</td>
                 <td>
                     @Html.ActionLink(" ", "Editar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                    @Html.ActionLink(" ", "Eliminar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "eliminarSucursal()" })
+                    @Html.ActionLink(" ", "Eliminar", "Sucursal", new { id = @item.iidsucursal }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "EliminarSucursal()" })
                 </td>
             </tr>
         }
     </tbody>
-
 </table>
+
+
+<script>
+
+    function EliminarSucursal() {
+        if (confirm("¿Deseas eliminar el registro?") == 1) { //Aceptar vale 1, Cancelar vale 0
+            //Click Aceptar
+            alert("Se elimino correctamente");
+        } else {
+            //Click Cancelar
+            //Detengo el comportamiento por defecto, no va hacia la accion Eliminar y no se borra
+            event.preventDefault();
+        }
+    }
+
+</script>

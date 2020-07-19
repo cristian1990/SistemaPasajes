@@ -22,5 +22,8 @@ namespace SistemaPasajes.Models
         public string descripcion { get; set; }
 
         public int bhabilitado { get; set; }
+
+        //AÑADO UNA PROPIEDAD (ERRORES DE VALIDACION)
+        public string mensajeError { get; set; }
     }
 }

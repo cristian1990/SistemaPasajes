@@ -11,15 +11,16 @@
     <div class="col-md-6">
         @using (Html.BeginForm("Agregar", "Marca", FormMethod.Post, new { @id = "frmAgregar" }))
         {
-
             <div>
                 @Html.LabelFor(p => p.nombre)
                 @Html.TextBoxFor(p => p.nombre, new { @class = "form-control" })
                 @Html.ValidationMessage("nombre", new { @class = "text-danger" })
-                @*@if (Model != null && Model.mensajeError != null)
+                <!--Si el mensaje es distinto a null es porque se lanzo el mje de error del Controller-->
+                @if (Model != null && Model.mensajeError != null)
                 {
+                    //Entonces muestro el mensaje
                     @Html.Label(Model.mensajeError, new { @class = "text-danger" })
-                }*@
+                }
             </div>
             <div>
                 @Html.LabelFor(p => p.descripcion)

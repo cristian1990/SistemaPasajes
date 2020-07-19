@@ -37,5 +37,59 @@ namespace SistemaPasajes.Controllers
             }
             return View(listaViaje);
         }
+
+        public ActionResult Agregar()
+        {
+            listarCombos();
+            return View();
+        }
+
+
+        //============================================================
+
+        //PARA LLENAR TODOS LOS COMBOBOX
+        //Creo todas las listas necesarias y las paso a la vista
+
+        public void listarLugar()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.Lugar
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.NOMBRE,
+                             Value = item.IIDLUGAR.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaLugar = lista;
+            }
+        }
+
+        public void listarBus()
+        {
+            //agregar
+            List<SelectListItem> lista;
+            using (var bd = new BDPasajeEntities())
+            {
+                lista = (from item in bd.Bus
+                         where item.BHABILITADO == 1
+                         select new SelectListItem
+                         {
+                             Text = item.PLACA,
+                             Value = item.IIDBUS.ToString()
+                         }).ToList();
+                lista.Insert(0, new SelectListItem { Text = "--Seleccione--", Value = "" });
+                ViewBag.listaBus = lista;
+            }
+        }
+
+        public void listarCombos()
+        {
+            listarLugar();
+            listarBus();
+        }
     }
 }
