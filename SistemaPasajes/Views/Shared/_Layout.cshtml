@@ -23,6 +23,7 @@
                 @Html.ActionLink("Empleado", "Index", "Empleado", new { area = "" }, new { @class = "navbar-brand" })
                 @Html.ActionLink("Bus", "Index", "Bus", new { area = "" }, new { @class = "navbar-brand" })
                 @Html.ActionLink("Viaje", "Index", "Viaje", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Tipo Usuario", "Index", "TipoUsuario", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -40,6 +41,8 @@
     </div>
 
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <!--Agregamos para poder utilizar AJAX-->
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 </html>

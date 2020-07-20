@@ -3,46 +3,55 @@
 
 @{
     ViewBag.Title = "Index";
+    var listaTipoBus = (List<SelectListItem>)ViewBag.listaTipoBus;
+    var listaMarca = (List<SelectListItem>)ViewBag.listaMarca;
+    var listaModelo = (List<SelectListItem>)ViewBag.listaModelo;
+    var listaSucursal = (List<SelectListItem>)ViewBag.listaSucursal;
 }
 
 <h2>Index</h2>
 
 @Html.ActionLink("Agregar", "Agregar", "Bus", null, new { @class = "btn btn-primary" })
 
-<table class="table table-bordered table-hover">
+<!--Creo el BeginForm para poder utilizar los Filtros-->
+@using (Html.BeginForm("Index", "Bus", FormMethod.Post, new { @id = "frmFiltrado" }))
+{
+    <table class="table table-bordered table-hover">
 
-    <tr>
-        <td>@Html.LabelFor(p => Model[0].iidBus)</td>
-        <td>@Html.LabelFor(p => Model[0].placa)</td>
-        <td>@Html.LabelFor(p => Model[0].nombreModelo)</td>
-        <td>@Html.LabelFor(p => Model[0].nombreSucursal)</td>
-        <td>@Html.LabelFor(p => Model[0].nombreTipoBus)</td>
-        <td>Operaciones</td>
-    </tr>
-    @*<tr>
+        <tr>
+            <td>@Html.LabelFor(p => Model[0].iidBus)</td>
+            <td>@Html.LabelFor(p => Model[0].placa)</td>
+            <td>@Html.LabelFor(p => Model[0].nombreModelo)</td>
+            <td>@Html.LabelFor(p => Model[0].nombreSucursal)</td>
+            <td>@Html.LabelFor(p => Model[0].nombreTipoBus)</td>
+            <td>Operaciones</td>
+        </tr>
+        <tr>
+            <!--PARA FILTRAR MEDIANTE COMBOBOX-->
+            <!--Deben tener el mismo nombre que la prop de la clase "iidBus"-->
             <td>@Html.TextBox("iidBus", null, new { @class = "form-control" })</td>
             <td>@Html.TextBox("placa", null, new { @class = "form-control" })</td>
             <td>@Html.DropDownList("iidModelo", listaModelo, null, new { @class = "form-control" })</td>
             <td>@Html.DropDownList("iidSucursal", listaSucursal, null, new { @class = "form-control" })</td>
             <td>@Html.DropDownList("iidTipoBus", listaTipoBus, null, new { @class = "form-control" })</td>
-        </tr>*@
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.iidBus</td>
-            <td>@item.placa</td>
-            <td>@item.nombreModelo</td>
-            <td>@item.nombreSucursal</td>
-            <td>@item.nombreTipoBus</td>
-            <td>
-                @Html.ActionLink(" ", "Editar", "Bus", new { id = @item.iidBus }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                <button type="button" onclick="ObtenerId(@item.iidBus)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
-                </button>
-            </td>
         </tr>
-    }
-</table>
-
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.iidBus</td>
+                <td>@item.placa</td>
+                <td>@item.nombreModelo</td>
+                <td>@item.nombreSucursal</td>
+                <td>@item.nombreTipoBus</td>
+                <td>
+                    @Html.ActionLink(" ", "Editar", "Bus", new { id = @item.iidBus }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                    <button type="button" onclick="ObtenerId(@item.iidBus)" class="glyphicon glyphicon-trash btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+                    </button>
+                </td>
+            </tr>
+        }
+    </table>
+}
 
 <!-- Modal - Bootstrap-->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -69,11 +78,21 @@
     @Html.Hidden("idBus");
 }
 
-@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>*@
 <script>
-    //$('#tablaCliente').DataTable();
+
+    //Para realizar el filtrado 
+    var frmFiltrado = document.getElementById("frmFiltrado"); //Obtengo el formulario
+    var controles = document.getElementsByClassName("form-control"); //Obtengo los Texbox y ComboBox
+    var ncontroles = controles.length; //Calculo la cantidad de controles
+
+    //Recorro todos los controles
+    for (var i = 0; i < ncontroles; i++) {
+        controles[i].onchange = function () { //Cuando hay un cambio (onchange), 
+            frmFiltrado.submit(); //se envia el formulario
+        }
+    }
+    //Fin
 
     function ObtenerId(idBusSeleccionado) {
         document.getElementById("idBus").value = idBusSeleccionado;

@@ -139,6 +139,8 @@
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\popper-utils.js" />
     <Content Include="Scripts\popper-utils.min.js" />
@@ -221,7 +223,11 @@
     <Compile Include="Controllers\ClienteController.cs" />
     <Compile Include="Controllers\EmpleadoController.cs" />
     <Compile Include="Controllers\MarcaController.cs" />
+    <Compile Include="Controllers\PaginaController.cs" />
+    <Compile Include="Controllers\RolController.cs" />
     <Compile Include="Controllers\SucursalController.cs" />
+    <Compile Include="Controllers\TipoUsuarioController.cs" />
+    <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Controllers\ViajeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -272,9 +278,11 @@
     <Compile Include="Models\Pagina.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\PaginaCLS.cs" />
     <Compile Include="Models\Rol.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RolCLS.cs" />
     <Compile Include="Models\RolPagina.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
@@ -297,6 +305,7 @@
     <Compile Include="Models\TipoUsuario.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\TipoUsuarioCLS.cs" />
     <Compile Include="Models\TIPOUSUARIOREGISTRO.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
@@ -351,6 +360,8 @@
     <Content Include="Views\Bus\Agregar.cshtml" />
     <Content Include="Views\Bus\Editar.cshtml" />
     <Content Include="Views\Viaje\Agregar.cshtml" />
+    <Content Include="Views\TipoUsuario\Index.cshtml" />
+    <Content Include="Views\Rol\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -360,6 +371,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Pagina\" />
+    <Folder Include="Views\Usuario\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

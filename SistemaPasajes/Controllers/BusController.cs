@@ -10,11 +10,15 @@ namespace SistemaPasajes.Controllers
     public class BusController : Controller
     {
         // GET: Bus
-        public ActionResult Index()
+        public ActionResult Index(BusCLS oBusCls)
         {
+            listarCombos(); //Listo los ComboBox
+            List<BusCLS> listaRpta = new List<BusCLS>();
             List<BusCLS> listaBus = null;
+
             using (var bd = new BDPasajeEntities())
             {
+                //Hago el listado de todos los Bus Habilitados
                 listaBus = (from bus in bd.Bus
                             join sucursal in bd.Sucursal
                             on bus.IIDSUCURSAL equals sucursal.IIDSUCURSAL
@@ -30,14 +34,59 @@ namespace SistemaPasajes.Controllers
                                 nombreModelo = tipoModelo.NOMBRE,
                                 nombreSucursal = sucursal.NOMBRE,
                                 nombreTipoBus = tipoBus.NOMBRE,
-                                iidModelo = tipoModelo.IIDMODELO,
-                                iidSucursal = sucursal.IIDSUCURSAL,
-                                iidTipoBus = tipoBus.IIDTIPOBUS
+                                iidModelo = tipoModelo.IIDMODELO, //Importante para filtrar
+                                iidSucursal = sucursal.IIDSUCURSAL, //Importante para filtrar
+                                iidTipoBus = tipoBus.IIDTIPOBUS //Importante para filtrar
 
                             }).ToList();
+
+                //Si no se ingreso ningun filtro de busqueda
+                if (oBusCls.iidBus == 0 && oBusCls.placa == null
+                    && oBusCls.iidModelo == 0 && oBusCls.iidSucursal == 0
+                    && oBusCls.iidTipoBus == 0)
+                {
+                    //Se muestran todos los Bus habilidatos
+                    listaRpta = listaBus;
+                }
+                else //Filtros sin Predicate (otra manera)
+                {
+                    //Filtro por Bus
+                    if (oBusCls.iidBus != 0)
+                    {
+                        //Se asigna la lista filtrada a listaBus
+                        listaBus = listaBus.Where(p => p.iidBus.ToString().Contains(oBusCls.iidBus.ToString())).ToList();
+                    }
+                    //Filtro por Placa
+                    if (oBusCls.placa != null)
+                    {
+                        //Si se ingresa otro parametro para filtrar se hace sobre "listaBus" que ya filtramos anterior (Asi se logra multiples filtros)
+                        listaBus = listaBus.Where(p => p.placa.Contains(oBusCls.placa)).ToList();
+                    }
+                    //Filtro por Modelo
+                    if (oBusCls.iidModelo != 0)
+                    {
+                        listaBus = listaBus.Where(p => p.iidModelo.ToString().Contains(oBusCls.iidModelo.ToString())).ToList();
+
+                    }
+                    //Filtro por Sucursak
+                    if (oBusCls.iidSucursal != 0)
+                    {
+                        listaBus = listaBus.Where(p => p.iidSucursal.ToString().Contains(oBusCls.iidSucursal.ToString())).ToList();
+                    }
+                    //Filtro por Tipo Bus
+                    if (oBusCls.iidTipoBus != 0)
+                    {
+                        listaBus = listaBus.Where(p => p.iidTipoBus.ToString().Contains(oBusCls.iidTipoBus.ToString())).ToList();
+                    }
+
+                    //Asigno el contenido de listaBus a listaRpta
+                    listaRpta = listaBus;
+                }
             }
-                return View(listaBus);
+
+            return View(listaRpta);
         }
+
 
         public ActionResult Agregar()
         {
