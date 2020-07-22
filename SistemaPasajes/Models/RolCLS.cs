@@ -13,7 +13,6 @@ namespace SistemaPasajes.Models
 
         [Required]
         [Display(Name = "Nombre Rol")]
-
         public string nombre { get; set; }
 
         [Required]

@@ -1,0 +1,117 @@
+﻿@model IEnumerable<SistemaPasajes.Models.PaginaCLS>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<!-- Button trigger modal - Bootstrap -->
+<button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Agregar
+</button>
+<!-- FIN Button trigger modal - Bootstrap -->
+
+<p>
+    <!--Llamo a la vista Parcial y le asigno el modelo (El Model = List<PaginaCLS>)-->
+    @*@Html.Partial("_TablaPagina", Model);*@
+
+    <!--Agregamos el Ajax.BeginForm, para el textbox del filtro-->
+    @using (Ajax.BeginForm("Filtrar", "", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        UpdateTargetId = "divPagina", //En la etiqueta con este ID, se coloca la respuesta del servidor
+        InsertionMode = InsertionMode.Replace //Se va a reemplazar por lo que se trae del servidor
+    }, new { @id = "frmFiltrado" })) //Indico el ID del formulario
+    {
+        @Html.Label("Ingrese mensaje")
+        @Html.TextBox("mensajeFiltro")
+        @*<input type="submit" value="Buscar" class="btn btn-primary" />*@
+
+        <!--En esta parte mostramos la vista Parcial-->
+        <div id="divPagina">
+            @Html.Partial("_TablaPagina", Model) <!--Enviamos el modelo a la vista parcial-->
+        </div>
+    }
+</p>
+
+
+<!--CREAMOS UN POPUP PARA AGREGAR UNA PAGINA-->
+<!-- Modal - Bootstrap -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!--AGREGAMOS EL AJAX AL FORMULARIO-->
+            @using (Ajax.BeginForm("Guardar", "Pagina", null, new AjaxOptions
+            {
+                HttpMethod = "POST", //Metodo de envio
+                OnSuccess = "Guardar", //Funcion de JS que se va a ejecutar
+                UpdateTargetId = "error" //Id de una etiqueta donde se muestra la info de error
+            }))
+            {
+                @Html.Hidden("titulo") //Utilizado para saber la operacion
+                <div class="modal-body">
+                    <!--En los TextBox los nombres deben llamarse igual que la prop de la clase Rol-->
+                    <div>
+                        @Html.Label("Id Pagina")
+                        @Html.TextBox("iidPagina", null, new { @class = "form-control", @readOnly = true })
+                    </div>
+                    <div>
+                        @Html.Label("Mensaje Link")
+                        @Html.TextBox("mensaje", null, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Accion")
+                        @Html.TextBox("accion", null, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Controlador")
+                        @Html.TextBox("controlador", null, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            }
+            <!--FIN AJAX EN FORMULARIO-->
+        </div>
+    </div>
+</div>
+
+<script>
+    //PARA BOTON DE FILTRADO
+    var frmFiltrado = document.getElementById("frmFiltrado");
+    var mensaje = document.getElementById("mensajeFiltro");
+
+    mensaje.onkeyup = function () { //Cuando se presione y suelte una tecla
+        $("#frmFiltrado").trigger("submit"); //Envio el formulario
+    }
+    //frmFiltrado.onsubmit = function () {
+    //    $("#frmFiltrado").trigger("submit");
+    //}
+    //FIN
+  
+    function Agregar() {
+        //el 1 se manda al controlador, para que sepa la operacion
+        document.getElementById("titulo").value = "1"; 
+    }
+
+    function Guardar(rpta) { //rpta: es el retorno que se envia desde el controlador
+        if (rpta == 1) //Si la respuesta es 1 es que se pudo agregar
+        {
+            //Cierro manualmente el popup
+            document.getElementById("btnCerrar").click();
+            alert("Se agrego correctamente");
+        } else {
+            alert("Ocurrio un error");
+        }
+    }
+
+</script>

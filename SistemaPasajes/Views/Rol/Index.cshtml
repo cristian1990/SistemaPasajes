@@ -1,7 +1,102 @@
-﻿
+﻿@using SistemaPasajes.Models
+@model List<RolCLS>
+
 @{
     ViewBag.Title = "Index";
 }
 
 <h2>Index</h2>
 
+<!-- Button trigger modal - Bootstrap -->
+<button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Agregar
+</button>
+<!-- FIN Button trigger modal - Bootstrap -->
+<!--Llamo a la vista Parcial y le asigno el modelo (El Model = List<RolCLS>)-->
+@*@Html.Partial("_TablaRol", Model);*@
+
+<!--Agregamos el Ajax.BeginForm, para el textbox del filtro-->
+@using (Ajax.BeginForm("Filtro", "", new AjaxOptions
+{
+    HttpMethod = "POST",
+    UpdateTargetId = "divRol", //En la etiqueta con este ID, se coloca la respuesta del servidor
+    InsertionMode = InsertionMode.Replace //Se va a reemplazar por lo que se trae del servidor
+}, new { @id = "frmFiltro" })) //Indico el ID del formulario
+{
+    @Html.Label("Ingrese nombre rol")
+    @Html.TextBox("nombreRol", null, new { @class = "form-control" }) //nombre, debe llamarse igual, el parametro del la accion Filtro()
+
+    <!--En esta parte mostramos la vista Parcial-->
+    <div id="divRol">
+        @Html.Partial("_TablaRol", Model) <!--Enviamos el modelo a la vista parcial-->
+    </div>
+}
+
+
+<!--CREAMOS UN POPUP PARA AGREGAR UN ROL-->
+<!-- Modal - Bootstrap -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!--AGREGAMOS EL AJAX AL FORMULARIO-->
+            @using (Ajax.BeginForm("Guardar", "Rol", null, new AjaxOptions
+            {
+                HttpMethod = "POST", //Metodo de envio
+                OnSuccess = "Guardar", //Funcion de JS que se va a ejecutar
+                UpdateTargetId = "error" //Id de una etiqueta donde se muestra la info de error
+            }))
+            {
+                @Html.Hidden("titulo") //Utilizado para saber la operacion
+                <div class="modal-body">
+                    <!--En los TextBox los nombres deben llamarse igual que la prop de la clase Rol-->
+                    <div>
+                        @Html.Label("Id Rol")
+                        @Html.TextBox("iidRol", null, new { @class = "form-control", @readOnly = true })
+                    </div>
+                    <div>
+                        @Html.Label("Nombre Rol")
+                        @Html.TextBox("nombre", null, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Descripcion")
+                        @Html.TextBox("descripcion", null, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            }
+            <!--FIN AJAX EN FORMULARIO-->
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var nombre = document.getElementById("nombreRol");
+    nombre.onkeyup = function () { //Cada vez que se presine y suelte una tecla
+        $("#frmFiltro").trigger("submit"); //envio el formulario
+    }
+
+    function Agregar() {
+        document.getElementById("titulo").value = 1;
+    }
+
+    function Guardar(resultado) { //resultado es la rpta que retorna el Controller
+        if (resultado == 1) { //Osea se afecto 1 fila
+            $("#frmFiltro").trigger("submit"); //Envio el formulario
+            document.getElementById("btnCerrar").click(); //Hago cerrar el Popup
+            alert("Se guardo correctamente");
+        } else {
+              alert("Ocurrio un error al intentar Guardar");
+        }
+    }
+
+</script>

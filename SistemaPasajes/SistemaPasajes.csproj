@@ -362,6 +362,9 @@
     <Content Include="Views\Viaje\Agregar.cshtml" />
     <Content Include="Views\TipoUsuario\Index.cshtml" />
     <Content Include="Views\Rol\Index.cshtml" />
+    <Content Include="Views\Rol\_TablaRol.cshtml" />
+    <Content Include="Views\Pagina\Index.cshtml" />
+    <Content Include="Views\Pagina\_TablaPagina.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -371,7 +374,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Pagina\" />
     <Folder Include="Views\Usuario\" />
   </ItemGroup>
   <ItemGroup>

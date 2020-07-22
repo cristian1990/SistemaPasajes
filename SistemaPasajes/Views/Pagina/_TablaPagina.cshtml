@@ -1,0 +1,39 @@
+﻿@model IEnumerable<SistemaPasajes.Models.PaginaCLS>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.iidpagina)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.mensaje)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.accion)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.controlador)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.iidpagina)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.mensaje)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.accion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.controlador)
+            </td>
+        </tr>
+    }
+
+</table>
+
