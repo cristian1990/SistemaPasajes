@@ -54,6 +54,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -225,6 +226,7 @@
     <Compile Include="Controllers\MarcaController.cs" />
     <Compile Include="Controllers\PaginaController.cs" />
     <Compile Include="Controllers\RolController.cs" />
+    <Compile Include="Controllers\RolPaginaController.cs" />
     <Compile Include="Controllers\SucursalController.cs" />
     <Compile Include="Controllers\TipoUsuarioController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -286,6 +288,7 @@
     <Compile Include="Models\RolPagina.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RolPaginaCLS.cs" />
     <Compile Include="Models\Sexo.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
@@ -312,6 +315,7 @@
     <Compile Include="Models\Usuario.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\UsuarioCLS.cs" />
     <Compile Include="Models\VENTA.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
@@ -365,6 +369,9 @@
     <Content Include="Views\Rol\_TablaRol.cshtml" />
     <Content Include="Views\Pagina\Index.cshtml" />
     <Content Include="Views\Pagina\_TablaPagina.cshtml" />
+    <Content Include="Views\RolPagina\Index.cshtml" />
+    <Content Include="Views\RolPagina\_TablaRolPagina.cshtml" />
+    <Content Include="Views\Usuario\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -374,7 +381,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Usuario\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

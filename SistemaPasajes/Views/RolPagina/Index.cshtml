@@ -1,0 +1,109 @@
+﻿@using SistemaPasajes.Models
+@model List<RolPaginaCLS>
+
+
+@{
+    ViewBag.Title = "Index";
+    var listaRol = (List<SelectListItem>)ViewBag.listaRol;
+    var listaPagina = (List<SelectListItem>)ViewBag.listaPagina;
+}
+
+<h2>Index</h2>
+
+<!-- Button trigger modal - Bootstrap -->
+<button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Agregar
+</button>
+
+<!--Llamo a la vista Parcial y le asigno el modelo (El Model = List<RolPaginaCLS>)-->
+@*@Html.Partial("_TablaRolPagina", Model);*@
+
+<!--Agregamos el Ajax.BeginForm, para el ComboBox del filtro-->
+@using (Ajax.BeginForm("Filtrar", "", new AjaxOptions
+{
+    HttpMethod = "POST",
+    UpdateTargetId = "divRolPagina", //En la etiqueta con este ID, se coloca la respuesta del servidor
+    InsertionMode = InsertionMode.Replace, //Se va a reemplazar por lo que se trae del servidor
+    OnSuccess = "Filtrar", //Funcion de JS  a ejecutar
+
+}, new { @id = "frmFiltrado" })) //Indico el ID del formulario
+{
+    //Llenamos el ComboBox
+    @Html.DropDownList("iidrol", listaRol, new { @class = "form-control" })
+
+    <!--En esta parte mostramos la vista Parcial-->
+    <div id="divRolPagina">
+        @Html.Partial("_TablaRolPagina", Model) <!--Enviamos el modelo a la vista parcial-->
+    </div>
+}
+
+
+<!-- Modal - Boostrap -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @using (Ajax.BeginForm("Guardar", "RolPagina", null, new AjaxOptions
+            {
+                HttpMethod = "POST",
+                OnSuccess = "Guardar",
+            }))
+            {
+                @Html.Hidden("titulo")
+                <div class="modal-body">
+
+                    <div>
+                        @Html.Label("Id Rol Pagina")
+                        @Html.TextBox("iidrolpagina", null, new { @class = "form-control", @readOnly = true })
+                    </div>
+                    <div>
+                        @Html.Label("Nombre Rol")
+                        @Html.DropDownList("iidrol", listaRol, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Nombre Pagina")
+                        @Html.DropDownList("iidpagina", listaPagina, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+                <div id="divRolPaginaError">
+
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    var iidrol = document.getElementById("iidrol");
+    iidrol.onchange = function () { //Si hay un cambio en el Combo
+        $("#frmFiltrado").trigger("submit"); //Envio el formulario
+    }
+
+    function Agregar() {
+        document.getElementById("titulo").value = 1;
+    }
+
+    function Guardar(rpta) { //rpta, lo recibo del controlador
+        if (rpta == 1) { //Osea se afecto 1 fila
+            $("#frmFiltrado").trigger("submit"); //Envio el formulario
+            document.getElementById("btnCerrar").click(); //Hago cerrar el Popup
+            alert("Se guardo correctamente");
+        } else {
+              alert("Ocurrio un error al intentar Guardar");
+        }
+    }
+
+</script>
