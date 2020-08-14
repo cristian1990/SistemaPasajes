@@ -56,10 +56,6 @@
                 <div class="modal-body">
                     <!--En los TextBox los nombres deben llamarse igual que la prop de la clase Rol-->
                     <div>
-                        @Html.Label("Id Rol")
-                        @Html.TextBox("iidRol", null, new { @class = "form-control", @readOnly = true })
-                    </div>
-                    <div>
                         @Html.Label("Nombre Rol")
                         @Html.TextBox("nombre", null, new { @class = "form-control" })
                     </div>
@@ -74,6 +70,8 @@
                 </div>
             }
             <!--FIN AJAX EN FORMULARIO-->
+            <!--Para mostrar los mjes de errores-->
+            <div id="error"></div>
         </div>
     </div>
 </div>
@@ -86,17 +84,43 @@
     }
 
     function Agregar() {
-        document.getElementById("titulo").value = 1;
+        Limpiar();
+        document.getElementById("titulo").value = -1;
     }
 
     function Guardar(resultado) { //resultado es la rpta que retorna el Controller
-        if (resultado == 1) { //Osea se afecto 1 fila
+        if (resultado == "1" || resultado == "0") { //Osea se afecto 1 o 0(caso exepcional) filas (esto viene del controller)
             $("#frmFiltro").trigger("submit"); //Envio el formulario
             document.getElementById("btnCerrar").click(); //Hago cerrar el Popup
             alert("Se guardo correctamente");
         } else {
-              alert("Ocurrio un error al intentar Guardar");
+            if (resultado == "-1") { //-1 indica que queremos editar
+                alert("Ya existe en la base de datos");
+                document.getElementById("error").innerHTML = "";
+            } else
+                alert("Ocurrio un error");
         }
+    }
+
+    //Esta funcion se llama desde la vista parcial _TablaRol (si es id es >=1 entonces queremos editar)
+    function Editar(id) {
+        Limpiar();
+        document.getElementById("titulo").value = id;
+        //alert(id);
+
+        //Hago la llamada al Action mediante Ajax
+        $.get("Rol/recuperarDatos/?titulo=" + id, function (data) { //En data esta la respuesta que viene del controlador
+            document.getElementById("nombre").value = data.nombre; //Lleno los texbox con la info (data.nombre) debe tener el mismo nombre de la propiedad
+            document.getElementById("descripcion").value = data.descripcion;
+
+        })
+    }
+
+    //Funcion para limpiar los texbox del popups, cada vez que se abren
+    function Limpiar() {
+        document.getElementById("nombre").value = "";
+        document.getElementById("descripcion").value = "";
+        document.getElementById("error").innerHTML = "";
     }
 
 </script>

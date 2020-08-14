@@ -15,6 +15,23 @@
     Agregar
 </button>
 
+@using (Ajax.BeginForm("Filtrar", "Usuario", null,
+                new AjaxOptions
+                {
+                    HttpMethod = "POST",
+                    UpdateTargetId = "divUsuario",
+                    InsertionMode = InsertionMode.Replace
+                }, new { @id = "frmFiltrado" }))
+{
+
+    @Html.Label("Ingrese nombre de la persona")
+    @Html.TextBox("nombrePersona", null, new { @class = "form-control" })
+
+    <!--En esta parte mostramos la vista Parcial-->
+    <div id="divUsuario">
+        @Html.Partial("_TablaUsuario", Model) <!--Enviamos el modelo a la vista parcial-->
+    </div>
+}
 
 <!-- Modal - Boostrap -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -32,27 +49,27 @@
                 OnSuccess = "Guardar",
             }))
             {
-                @Html.Hidden("titulo")
+                @*Para enviar esta informacion al controlador*@
+                @Html.Hidden("titulo") //Vamos a asignar el valor 1 con JS
                 @Html.Hidden("nombrePersona")
                 @*@Html.TextBox("titulo")*@
                 @*@Html.TextBox("nombrePersona")*@
                 <div class="modal-body">
-
                     <div>
                         @Html.Label("Id Usuario")
                         @Html.TextBox("iidusuario", null, new { @class = "form-control", @readOnly = true })
                     </div>
                     <div>
                         @Html.Label("Nombre Usuario")
-                        @Html.TextBox("iidusuario", null, new { @class = "form-control" })
+                        @Html.TextBox("nombreusuario", null, new { @class = "form-control" })
                     </div>
-                    <div>
+                    <div id="divContraOcultar">
                         @Html.Label("Contraseña")
                         @Html.Password("contra", null, new { @class = "form-control" })
                     </div>
-                    <div>
+                    <div id="divUsuarioOcultar">
                         @Html.Label("Nombre Persona")
-                        @Html.DropDownList("idd", listaPersona, new { @class = "form-control" })
+                        @Html.DropDownList("iid", listaPersona, new { @class = "form-control" })
                     </div>
                     <div>
                         @Html.Label("Nombre Rol")
@@ -64,7 +81,6 @@
                     <button type="submit" class="btn btn-primary">Guardar cambios</button>
                 </div>
             }
-
         </div>
     </div>
 </div>
@@ -73,14 +89,30 @@
 
     function Agregar() {
         document.getElementById("titulo").value = "1";
-        document.getElementById("divContraOcultar").style.display = "block";
-        document.getElementById("divUsuarioOcultar").style.display = "block";
+        //document.getElementById("divContraOcultar").style.display = "block";
+        //document.getElementById("divUsuarioOcultar").style.display = "block";
     }
 
     var iid = document.getElementById("iid");
     iid.onchange = function () { //Cada vez que haya un cambio
-        //mando el texto de la opcion seleccionada al Hidden
+        //Mando el texto de la opcion seleccionada por el usuario al Hidden "nombrePersona"
         document.getElementById("nombrePersona").value = iid.options[iid.selectedIndex].text;
+    }
+
+    function Guardar(rpta) {
+
+        if (rpta != 0) {
+            alert("Se ejecuto correctamente");
+            document.getElementById("btnCerrar").click();
+        } else {
+            alert("Ocurrio un error");
+        }
+    }
+
+    //Para el Filtrado por Nombre
+    var nombrePersona = document.getElementById("nombrePersona");
+    nombrePersona.onkeyup = function () { //Cuando toca una tecla
+        $("#frmFiltrado").trigger("submit"); //Envio el formulario
     }
 
 </script>

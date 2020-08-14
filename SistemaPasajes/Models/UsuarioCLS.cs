@@ -29,6 +29,6 @@ namespace SistemaPasajes.Models
         public string nombrePersona { get; set; }
         public string nombreRol { get; set; }
         public string nombreTipoEmpleado { get; set; }
-        public string nombrePersonaEnviar { get; set; }
+        //public string nombrePersonaEnviar { get; set; }
     }
 }

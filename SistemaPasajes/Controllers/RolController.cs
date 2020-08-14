@@ -65,23 +65,75 @@ namespace SistemaPasajes.Controllers
             return PartialView("_TablaRol", listaRol);
         }
 
-        public int Guardar(RolCLS oRolCLS, int titulo)
+        public string Guardar(RolCLS oRolCLS, int titulo)
         {
-            int rpta = 0;
-            using (var bd = new BDPasajeEntities())
+            //Vacio indica error
+            string rpta = string.Empty;
+
+            try
             {
-                //Si titulo = 1, es que intento agregar
-                if (titulo.Equals(1)) //Este 1, lo recibo del Html.Hidden("titulo") del Index
+                if (!ModelState.IsValid)
                 {
-                    Rol oRol = new Rol();
-                    oRol.NOMBRE = oRolCLS.nombre;
-                    oRol.DESCRIPCION = oRolCLS.descripcion;
-                    oRol.BHABILITADO = 1;
-                    bd.Rol.Add(oRol);
-                    rpta = bd.SaveChanges(); //Almaceno el numero de filas afectadas
+                    var query = (from state in ModelState.Values //Obtengo los estados de cada propiedad
+                                 from error in state.Errors //Obtengo los mjes de error
+                                 select error.ErrorMessage).ToList(); //En caso de haber errores los almaceno en una lista
+                                                                      //Formo el HTML, para mostrar los errores en la vista
+                    rpta += "<ul class='list-group'>";
+                    foreach (var item in query)
+                    {
+                        rpta += "<li class='list-group-item'>" + item + "</li>";
+                    }
+                    rpta += "</ul>";
+                }
+                else
+                {
+                    using (var bd = new BDPasajeEntities())
+                    {
+                        //Si titulo = -1, es que intento agregar
+                        if (titulo.Equals(-1)) //Este -1, lo recibo del Html.Hidden("titulo") del Index
+                        {
+                            Rol oRol = new Rol();
+                            oRol.NOMBRE = oRolCLS.nombre;
+                            oRol.DESCRIPCION = oRolCLS.descripcion;
+                            oRol.BHABILITADO = 1;
+                            bd.Rol.Add(oRol);
+                            //SaveChanges, devuelve un int del numero de filas afectadas
+                            rpta = bd.SaveChanges().ToString(); //Almaceno el numero de filas afectadas
+                            
+                            //si rpta es 0, es porque no se almaceno nada en la BD
+                            if (rpta == "0") rpta = string.Empty; //Sobreescribo con vacio para indicar error
+                        }
+                        else //Si el titulo es >=1, es que quiero editar
+                        {
+                            Rol oRol = bd.Rol.Where(p => p.IIDROL == titulo).First(); //Buscamos el rol a editar
+                            oRol.NOMBRE = oRolCLS.nombre;
+                            oRol.DESCRIPCION = oRolCLS.descripcion;
+                            //Si no se edita ningun valor el SaveChanges, valdra cero, si no vale el numero de filas afectadas
+                            rpta = bd.SaveChanges().ToString();
+                        }
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                rpta = string.Empty;
+            }
+           //Si todo se guardo bien enviara a la vista un "1", porque se afecto 1 fila
            return rpta;
+        }
+
+        //Busco la entidad para llenar los datos en el Popups Editar
+        public JsonResult recuperarDatos(int titulo)
+        {
+            RolCLS oRolCLS = new RolCLS();
+            using (var bd = new BDPasajeEntities())
+            {
+                Rol oRol = bd.Rol.Where(p => p.IIDROL == titulo).First(); //Busco el Rol
+                oRolCLS.nombre = oRol.NOMBRE; //Asigno los datos al texbox
+                oRolCLS.descripcion = oRol.DESCRIPCION;
+            }
+            //Serializo el objeto a Json
+            return Json(oRolCLS, JsonRequestBehavior.AllowGet);
         }
     }
 }
