@@ -14,7 +14,9 @@
         <th>
             @Html.DisplayNameFor(model => model.controlador)
         </th>
-        <th></th>
+        <th>
+            Operaciones
+        </th>
     </tr>
 
     @foreach (var item in Model)
@@ -31,6 +33,11 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.controlador)
+            </td>
+            <td>
+                <button type="button" onclick="Editar(@item.iidpagina)" class="btn btn-primary glyphicon glyphicon-edit" data-toggle="modal" data-target="#exampleModal">
+                </button>
+                <button type="button" onclick="Eliminar(@item.iidpagina)" class="btn btn-danger glyphicon glyphicon-trash" data-toggle="modal" data-target="#exampleModalConfirmacion"></button>
             </td>
         </tr>
     }

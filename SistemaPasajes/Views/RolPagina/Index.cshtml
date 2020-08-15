@@ -29,7 +29,7 @@
 }, new { @id = "frmFiltrado" })) //Indico el ID del formulario
 {
     //Llenamos el ComboBox
-    @Html.DropDownList("iidrol", listaRol, new { @class = "form-control" })
+    @Html.DropDownList("iidrolFiltro", listaRol, new { @class = "form-control" })
 
     <!--En esta parte mostramos la vista Parcial-->
     <div id="divRolPagina">
@@ -37,6 +37,24 @@
     </div>
 }
 
+<!--CREAMOS UN POPUP PARA CONFIRMAR ANTES DE ELIMINAR-->
+<div class="modal fade" id="exampleModalConfirmacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Dese guardar los cambios?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div style="padding:1em">
+                <button type="button" id="btnCerrarConfirmacion" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="EliminarRegistro()" class="btn btn-info">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal - Boostrap -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -52,15 +70,12 @@
             {
                 HttpMethod = "POST",
                 OnSuccess = "Guardar",
+                UpdateTargetId = "divRolPaginaError", //Una etiqueta con Id donde se mostrara el error
+                InsertionMode = InsertionMode.Replace //Reemplazamos el dato que llega del servidor
             }))
             {
                 @Html.Hidden("titulo")
                 <div class="modal-body">
-
-                    <div>
-                        @Html.Label("Id Rol Pagina")
-                        @Html.TextBox("iidrolpagina", null, new { @class = "form-control", @readOnly = true })
-                    </div>
                     <div>
                         @Html.Label("Nombre Rol")
                         @Html.DropDownList("iidrol", listaRol, new { @class = "form-control" })
@@ -74,8 +89,8 @@
                     <button type="button" id="btnCerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-primary">Guardar cambios</button>
                 </div>
+                <!--Para mostrar los mensajes de error-->
                 <div id="divRolPaginaError">
-
                 </div>
             }
 
@@ -93,17 +108,59 @@
     }
 
     function Agregar() {
-        document.getElementById("titulo").value = 1;
+        Limpiar();
+        document.getElementById("titulo").value = -1; //-1 Se envia al controlador
     }
 
     function Guardar(rpta) { //rpta, lo recibo del controlador
-        if (rpta == 1) { //Osea se afecto 1 fila
+        Limpiar();
+        if (rpta == "1" || rpta == "0") { //Osea se afecto 1 fila o 0(solo para editar)
             $("#frmFiltrado").trigger("submit"); //Envio el formulario
             document.getElementById("btnCerrar").click(); //Hago cerrar el Popup
             alert("Se guardo correctamente");
         } else {
-              alert("Ocurrio un error al intentar Guardar");
+            alert("Ocurrio un error al intentar Guardar");
         }
     }
 
+    //Funcion para editarel Rol
+    function Editar(idRolPagina) {
+        Limpiar();
+        $.get("RolPagina/recuperarInformacion/?idRolPagina=" + idRolPagina, function (data) { //data: tiene la info enviada del controlador
+            document.getElementById("iidrol").value = data.iidrol; //Llenamos la info en los textbox
+            document.getElementById("iidpagina").value = data.iidpagina; //(data.iidpagina) deben tener el mismo nombre de la prop de la clase
+        })
+        document.getElementById("titulo").value = idRolPagina //Asigno al Hidden("titulo") el valir del ID
+    }
+
+    //Funcion para limpiar los Textbox del popups
+    function Limpiar() {
+        var controles = document.getElementsByClassName("form-control");
+        var control;
+        for (var i = 0; i < controles.length; i++) {
+            control = controles[i];
+            control.value = "";
+        }
+    }
+
+    //Metodo para obtener el Id de la entidad seleccionada
+    function Eliminar(iidRolPagina) {
+        //alert(iidRolPagina);
+        document.getElementById("titulo").value = iidRolPagina; //Asigno el id al Hidden("titulo")
+    }
+
+     function EliminarRegistro() {
+        var id = document.getElementById("titulo").value; //Obtengo el valor del Hidden("titulo")
+
+        $.get("RolPagina/EliminarRolPagina/?iidrolpagina=" + id, function (data) { //Obtengo la data enviada del servidor
+
+            if (data == 1) { //1 porque se afecto un registro (se recibe del controlador)
+                document.getElementById("btnCerrarConfirmacion").click(); //Cierro el popups
+                alert("Se ejecuto correctamente");
+                $("#frmFiltrado").trigger("submit"); //Envio el formiulario
+            } else {
+                alert("Ocurrio un error");
+            }
+        })
+    }
 </script>

@@ -35,6 +35,24 @@
     }
 </p>
 
+<!--CREAMOS UN POPUP PARA CONFIRMAR ANTES DE ELIMINAR-->
+<div class="modal fade" id="exampleModalConfirmacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Dese guardar los cambios?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div style="padding:1em">
+                <button type="button" id="btnCerrarConfirmacion" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="EliminarRegistro()" class="btn btn-info">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--CREAMOS UN POPUP PARA AGREGAR UNA PAGINA-->
 <!-- Modal - Bootstrap -->
@@ -52,16 +70,13 @@
             {
                 HttpMethod = "POST", //Metodo de envio
                 OnSuccess = "Guardar", //Funcion de JS que se va a ejecutar
-                UpdateTargetId = "error" //Id de una etiqueta donde se muestra la info de error
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "divError" //Id de una etiqueta donde se muestra la info de error
             }))
             {
                 @Html.Hidden("titulo") //Utilizado para saber la operacion
                 <div class="modal-body">
                     <!--En los TextBox los nombres deben llamarse igual que la prop de la clase Rol-->
-                    <div>
-                        @Html.Label("Id Pagina")
-                        @Html.TextBox("iidPagina", null, new { @class = "form-control", @readOnly = true })
-                    </div>
                     <div>
                         @Html.Label("Mensaje Link")
                         @Html.TextBox("mensaje", null, new { @class = "form-control" })
@@ -81,6 +96,8 @@
                 </div>
             }
             <!--FIN AJAX EN FORMULARIO-->
+            <!--Para mostrar los mjes de error-->
+            <div id="divError"></div>
         </div>
     </div>
 </div>
@@ -97,21 +114,60 @@
     //    $("#frmFiltrado").trigger("submit");
     //}
     //FIN
-  
+
     function Agregar() {
-        //el 1 se manda al controlador, para que sepa la operacion
-        document.getElementById("titulo").value = "1"; 
+        Limpiar();
+        //el -1 se manda al controlador, para que sepa la operacion
+        document.getElementById("titulo").value = "-1";
     }
 
     function Guardar(rpta) { //rpta: es el retorno que se envia desde el controlador
-        if (rpta == 1) //Si la respuesta es 1 es que se pudo agregar
+        if (rpta == "1" || rpta == "0") //Si la respuesta es 1 es que se pudo agregar, tambien puede ser 0 si no se modifico nada sobre un obj
         {
-            //Cierro manualmente el popup
-            document.getElementById("btnCerrar").click();
+            $("#frmFiltrado").trigger("submit"); //Envio el formulario
+            document.getElementById("btnCerrar").click(); //Cierro manualmente el popup
             alert("Se agrego correctamente");
         } else {
             alert("Ocurrio un error");
         }
+    }
+
+    function Editar(idPagina) {
+        Limpiar();
+        //Obtenemos la informacion del controlador (no llega en JSON) y llenamos los textbox
+        $.get("Pagina/recuperarInformacion/?idPagina=" + idPagina, function (data) { //Obtenemos el object (en data esta la respuesta del controlador)
+            document.getElementById("mensaje").value = data.mensaje; //Cargamos los datos en el popups
+            document.getElementById("accion").value = data.accion; //data.accion, debe tener el mismo nombre de la prop de la clase
+            document.getElementById("controlador").value = data.controlador;
+        })
+        document.getElementById("titulo").value = idPagina; //Escribimos en el Hidden, el idPagina
+    }
+
+    //Funcion para limpiar el contenido de los popups, cada vez que se abre
+    function Limpiar() {
+        var controles = document.getElementsByClassName("form-control");
+        for (var i = 0; i < controles.length; i++) { //Recorro todos los controles
+            controles[i].value = ""; //Vacio todos los textbox
+        }
+    }
+
+    //Metodo para obtener el Id de la entidad seleccionada
+    function Eliminar(iidpagina) {
+        //alert(iidpagina);
+        document.getElementById("titulo").value = iidpagina; //Asigno al Hidden("titulo"), el Id seleccionado para enviar al controlador
+    }
+
+    //Metodo para realizar la eliminacion de la pagina
+    function EliminarRegistro() {
+        var iidpagina = document.getElementById("titulo").value; //Obtengo el valor del Hidden("titulo")
+
+        $.get("Pagina/EliminarPagina/?iidpagina=" + iidpagina, function (data) { //data es la respuesta enviada del servidor
+            if (data == 1) { //Tendra 1 porque solo se modifica un registro
+                alert("Se ejecuto correctamente");
+                $("#frmFiltrado").trigger("submit"); //Envio el formulario
+                document.getElementById("btnCerrarConfirmacion").click(); //Cierro el popups
+            }
+        })
     }
 
 </script>

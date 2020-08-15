@@ -19,6 +19,7 @@
                 <td>@item.nombreRol</td>
                 <td>@item.nombreMensaje</td>
                 <td>
+                    <!--Se envia el Id del rol seleccionado al controlador-->
                     <button type="button" onclick="Editar(@item.iidrolpagina)" class="btn btn-primary glyphicon glyphicon-edit" data-toggle="modal" data-target="#exampleModal">
                     </button>
                     <button type="button" onclick="Eliminar(@item.iidrolpagina)" class="btn btn-danger glyphicon glyphicon-trash" data-toggle="modal" data-target="#exampleModalConfirmacion"></button>

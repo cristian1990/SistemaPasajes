@@ -135,5 +135,28 @@ namespace SistemaPasajes.Controllers
             //Serializo el objeto a Json
             return Json(oRolCLS, JsonRequestBehavior.AllowGet);
         }
+
+        //Realizamos un borrado logico
+        public string Eliminar(RolCLS oRolCls)
+        {
+            //Error
+            string rpta = string.Empty;
+            try
+            {
+                int idrol = oRolCls.iidRol;
+                using (var bd = new BDPasajeEntities())
+                {
+                    Rol oRol = bd.Rol.Where(p => p.IIDROL == idrol).First();
+                    oRol.BHABILITADO = 0;
+                    rpta = bd.SaveChanges().ToString(); //En este caso siempre afectara solo un registro
+                }
+            }
+            catch (Exception ex)
+            {
+                rpta = "";
+            }
+            //Si todo salio bien, se enviara un "1"
+            return rpta;
+        }
     }
 }

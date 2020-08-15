@@ -32,6 +32,25 @@
     </div>
 }
 
+<!--CREAMOS UN POPUP PARA CONFIRMAR AL ELIMINAR-->
+<!-- Modal -->
+<div class="modal fade" id="exampleModalConfirmacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Dese guardar los cambios?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div style="padding:1em">
+                <button type="button" id="btnCerrarConfirmacion" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="EliminarRegistro()" class="btn btn-info">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--CREAMOS UN POPUP PARA AGREGAR UN ROL-->
 <!-- Modal - Bootstrap -->
@@ -71,7 +90,8 @@
             }
             <!--FIN AJAX EN FORMULARIO-->
             <!--Para mostrar los mjes de errores-->
-            <div id="error"></div>
+            <div id="error">
+            </div>
         </div>
     </div>
 </div>
@@ -121,6 +141,25 @@
         document.getElementById("nombre").value = "";
         document.getElementById("descripcion").value = "";
         document.getElementById("error").innerHTML = "";
+    }
+
+    //Metodo para enviar el Id del Rol seleccionado al controlador
+    function Eliminar(idRol) {
+        document.getElementById("titulo").value = idRol;
+    }
+
+    //Eliminamos el registro
+    function EliminarRegistro() {
+
+        var id = document.getElementById("titulo").value;
+
+        $.get("Rol/Eliminar/?iidRol=" + id, function (data) { //Obtengo el obj con los datos
+            if (data == "1") {
+                alert("Se ejecuto correctamente");
+                $("#frmFiltro").trigger("submit"); //Envio el formulario
+                document.getElementById("btnCerrarConfirmacion").click(); //Cerramos el popups
+            }
+        })
     }
 
 </script>
