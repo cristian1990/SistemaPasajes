@@ -373,6 +373,7 @@
     <Content Include="Views\RolPagina\_TablaRolPagina.cshtml" />
     <Content Include="Views\Usuario\Index.cshtml" />
     <Content Include="Views\Usuario\_TablaUsuario.cshtml" />
+    <Content Include="Views\Viaje\_TablaViaje.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

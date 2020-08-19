@@ -189,7 +189,6 @@ namespace SistemaPasajes.Controllers
             {
                 rpta = 0;
             }
-
             return rpta;
         }
 

@@ -55,10 +55,13 @@ namespace SistemaPasajes.Models
 
         public string mensaje { get; set; }
 
+        //Para transformar el formato de la fecha
         public string fechaViajeCadena { get; set; }
 
+        //Para mostrar la foto, debemos obtener la extension
         public string extension { get; set; }
 
+        //Para convertir el tipo de la boto de Byte A Base64
         public string fotoRecuperCadena { get; set; }
     }
 }

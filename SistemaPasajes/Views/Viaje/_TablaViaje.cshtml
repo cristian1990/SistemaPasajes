@@ -1,0 +1,32 @@
+﻿@using SistemaPasajes.Models
+@model List<ViajeCLS>
+
+<table class="table table-bordered table-hover">
+
+    <tr>
+        <td>@Html.LabelFor(p => Model[0].iidViaje)</td>
+        <td>@Html.LabelFor(p => Model[0].nombreLugarOrigen)</td>
+        <td>@Html.LabelFor(p => Model[0].nombreLugarDestino)</td>
+        <td>@Html.LabelFor(p => Model[0].nombreBus)</td>
+        <td>Operaciones</td>
+
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.iidViaje</td>
+            <td>@item.nombreLugarOrigen</td>
+            <td>@item.nombreLugarDestino</td>
+            <td>@item.nombreBus</td>
+            @*<td>
+                    @Html.ActionLink(" ", "Editar", "Viaje", new { id = @item.iidViaje }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
+                    @Html.ActionLink(" ", "Eliminar", "Viaje", new { id = @item.iidViaje }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "eliminarSucursal()" })
+                </td>*@
+            <td>
+                <button type="button" onclick="Editar(@item.iidViaje)" class="btn btn-primary glyphicon glyphicon-edit" data-toggle="modal" data-target="#exampleModal"></button>
+                <!--exampleModalConfirmacion, abrira el modal del index, tiene que tener el mismo nombre-->
+                <button type="button" onclick="Eliminar(@item.iidViaje)" class="btn btn-danger glyphicon glyphicon-trash" data-toggle="modal" data-target="#exampleModalConfirmacion"></button>
+            </td>
+        </tr>
+    }
+</table>

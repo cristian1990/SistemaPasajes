@@ -3,36 +3,210 @@
 
 @{
     ViewBag.Title = "Index";
+    var listaLugar = (List<SelectListItem>)ViewBag.listaLugar;
+    var listaBus = (List<SelectListItem>)ViewBag.listaBus;
 }
 
 <h2>Index</h2>
-@Html.ActionLink("Agregar", "Agregar", "Viaje", null, new { @class = "btn btn-primary" })
+<button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Agregar
+</button>
 
-<table class="table table-bordered table-hover">
 
-    <tr>
-        <td>@Html.LabelFor(p => Model[0].iidViaje)</td>
-        <td>@Html.LabelFor(p => Model[0].nombreLugarOrigen)</td>
-        <td>@Html.LabelFor(p => Model[0].nombreLugarDestino)</td>
-        <td>@Html.LabelFor(p => Model[0].nombreBus)</td>
-        <td>Operaciones</td>
+@using (Ajax.BeginForm("Filtrar", "Viaje", null, new AjaxOptions
+{
+    HttpMethod = "POST",
+    UpdateTargetId = "divViaje",
+    InsertionMode = InsertionMode.Replace
+}, new { @id = "frmFiltrar" }))
+{
+    <!--Filtro de busqueda, el valor de lugarDestinoParametro, se envia al controlador-->
+    @Html.Label("Ingrese lugar destino")
+    @Html.DropDownList("lugarDestinoParametro", listaLugar, new { @class = "form-control" })
 
-    </tr>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.iidViaje</td>
-            <td>@item.nombreLugarOrigen</td>
-            <td>@item.nombreLugarDestino</td>
-            <td>@item.nombreBus</td>
-            <td>
-                @Html.ActionLink(" ", "Editar", "Viaje", new { id = @item.iidViaje }, new { @class = "glyphicon glyphicon-edit btn btn-primary" })
-                @Html.ActionLink(" ", "Eliminar", "Viaje", new { id = @item.iidViaje }, new { @class = "glyphicon glyphicon-trash btn btn-danger", @onclick = "eliminarSucursal()" })
-            </td>
-            @*<td>
-                    <button type="button" onclick="Editar(@item.iidViaje)" class="btn btn-primary glyphicon glyphicon-edit" data-toggle="modal" data-target="#exampleModal"></button>
-                    <button type="button" onclick="Eliminar(@item.iidViaje)" class="btn btn-danger glyphicon glyphicon-trash" data-toggle="modal" data-target="#exampleModalConfirmacion"></button>
-                </td>*@
-        </tr>
+    <!--Cargamos la tabla parcial y le pasamos el modelo-->
+    <div id="divViaje">
+        @Html.Partial("_TablaViaje", Model)
+    </div>
+}
+
+
+<!-- Modal - Bootstrap -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @using (Ajax.BeginForm("Guardar", "Viaje", null, new AjaxOptions
+            {
+                HttpMethod = "POST",
+                OnSuccess = "Guardar",
+                UpdateTargetId = "error"
+            }, new { enctype = "multipart/form-data" })) //Inportante para enviar imagenes o archivos
+            {
+                <!--Para enviar informacion al controlador-->
+                @Html.Hidden("titulo")
+                <div class="modal-body">
+                    <div>
+                        @Html.Label("Lugar de Origen")
+                        @Html.DropDownList("iidLugarOrigen", listaLugar, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Lugar  Destino")
+                        @Html.DropDownList("iidLugarDestino", listaLugar, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Precio")
+                        @Html.Editor("precio", null, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                    </div>
+                    <div>
+                        @Html.Label("Fecha de Viaje")
+                        @Html.Editor("fechaViaje", null, new { htmlAttributes = new { @class = "form-control", @type = "datetime-local" } })
+                    </div>
+                    <div>
+                        @Html.Label("Bus")
+                        @Html.DropDownList("iidBus", listaBus, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Numero de Asientos")
+                        @Html.Editor("numeroAsientosDisponibles", null, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                    </div>
+                    <!--Div para ingresar una foto-->
+                    <div>
+                        @Html.Label("Foto Recuperar")
+                        <img width="150" height="150" id="imgFoto" style="display:block" />
+                        @Html.TextBox("foto", "", new { type = "file", id = "fupFoto" })
+                    </div>
+                    <div>
+                        <!--Para enviar el nombre de la foto-->
+                        @Html.Hidden("nombreFoto")
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            }
+            <div id="error"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - Bootstrap (Para confirmar)-->
+<!--exampleModalConfirmacion, tiene que apuntar al de _TablaViaje-->
+<div class="modal fade" id="exampleModalConfirmacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Dese guardar los cambios?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div style="padding:1em">
+                <button type="button" id="btnCerrarConfirmacion" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="ConfirmarEliminar()" class="btn btn-info">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function Agregar() {
+        Limpiar();
+        document.getElementById("titulo").value = -1; //Asigno el valor de -1 al Hidden("titulo")
     }
-</table>
+
+    //Recibo el Id del viaje a editar desde la vista parcial
+    function Editar(idviaje) {
+        Limpiar();
+        document.getElementById("titulo").value = idviaje; //Tomo el valor del Hidden
+        //Obtenemos la informacion del objeto
+        $.get("Viaje/recuperarInformacion/?idViaje=" + idviaje, function (data) { //En data se encuentra la informacion enviada desde el JsonResult
+
+            //Llenamos la informacion
+            document.getElementById("iidLugarOrigen").value = data.iidLugarOrigen;
+            document.getElementById("iidLugarDestino").value = data.iidLugarDestino;
+            document.getElementById("precio").value = data.precio;
+            document.getElementById("fechaViaje").value = data.fechaViajeCadena;
+            document.getElementById("iidBus").value = data.iidBus;
+            document.getElementById("numeroAsientosDisponibles").value = data.numeroAsientosDisponibles;
+            document.getElementById("imgFoto").src = "data:image/" + data.extension + ";base64," + data.fotoRecuperCadena;
+        })
+    }
+
+    //Funcion para limpiar los input al cargar los popups
+    function Limpiar() {
+        var controles = document.getElementsByClassName("form-control");
+        var ncontroles = controles.length;
+
+        for (var i = 0; i < ncontroles; i++) {
+            controles[i].value = "";
+        }
+        //Limpio el input de las fotos y de error
+        document.getElementById("imgFoto").src = "";
+        document.getElementById("error").innerHTML = "";
+    }
+
+    //Para hacer el preview de la foto
+    var imgFoto = document.getElementById("imgFoto");
+    var fupFoto = document.getElementById("fupFoto");
+
+    fupFoto.onchange = function () {  //Cada vez que haya un cambio (Seleccione una foto)
+        var files = fupFoto.files[0]; //Obtengo la primer imagen seleccionada
+        var reader = new FileReader(); //Para manipular archivos
+        reader.onloadend = function () { //Cuando termine de leer el archivo
+            imgFoto.src = reader.result; //Obtengo la ruta de la foto
+            document.getElementById("nombreFoto").value = files.name; //Obtengo el nombre del archivo y lo asigno a Hidden("nombreFoto")
+        }
+
+        reader.readAsDataURL(files); //Lee el archivo
+    }
+
+    //Funcio para guardar un nuevo viaje
+    function Guardar(rpta) { //rpta, llega del controlador
+        if (rpta == "1") {
+            alert("Se ejecuto correctamente");
+            document.getElementById("btnClose").click(); //Cerramos el popups
+            $("#frmFiltrar").trigger("submit"); //Enviamos el formulario
+        } else {
+            alert("Ocurrio un error");
+        }
+    }
+
+    //Para filtrar por lugar de destno
+    // var frmFiltrar = document.getElementById("frmFiltrar");
+    var lugarDestinoParametro = document.getElementById("lugarDestinoParametro");
+    lugarDestinoParametro.onchange = function () { //Cuando haya un cambio
+        $("#frmFiltrar").trigger("submit"); //Enviamos el formulario
+    }
+
+    //La funcion Eliminar se lanza desde la vista parcial _TablaViaje
+    function Eliminar(idViaje) {
+        document.getElementById("titulo").value = idViaje; //Escribimos en el Hidden el Id seleccionado
+    }
+
+    //Funcion para confirmar (Popups)
+    function ConfirmarEliminar() {
+        var idViaje = document.getElementById("titulo").value; //Tomo el Id del viaje - Hidden("titulo")
+        $.get("Viaje/EliminarViaje/?idViaje=" + idViaje, function (data) { //data: tendra la rpta enviada del controlador, del action Guardar
+
+            if (data == 1) { //1 indica que se afecto un registro
+                alert("Se ejecuto correctamente");
+                document.getElementById("btnCerrarConfirmacion").click(); //Cierro el popups
+                $("#frmFiltrar").trigger("submit"); //Envio el formulario (Para refrescar la pantallay listar los viajes de nuevo)
+            } else {
+                alert("Ocurrio un error");
+            }
+        })
+    }
+
+
+</script>
