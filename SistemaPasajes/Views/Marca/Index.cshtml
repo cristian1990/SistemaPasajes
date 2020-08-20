@@ -9,7 +9,10 @@
 @Html.ActionLink("Agregar", "Agregar", "Marca", null, new { @class = "btn btn-primary" })
 
 <!--Para imprimir PDF-->
-@Html.ActionLink("PDF", "GenerarPDF", "Marca", null, new { @class = "btn btn-primary", @target="_blank" })
+@Html.ActionLink("PDF", "GenerarPDF", "Marca", null, new { @class = "btn btn-primary", @target = "_blank" })
+
+<!--Para imprimir Excel-->
+@Html.ActionLink("Excel", "GenerarExcel", "Marca", null, new { @class = "btn btn-primary", @target = "_blank" })
 
 <!--Para realizar una busqueda por Marca, agrego el BeginForm-->
 @using (Html.BeginForm("Index", "Marca", FormMethod.Post))

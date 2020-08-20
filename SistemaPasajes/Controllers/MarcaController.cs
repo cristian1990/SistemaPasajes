@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using SistemaPasajes.Models; //Colocar
 
 namespace SistemaPasajes.Controllers
@@ -239,6 +242,52 @@ namespace SistemaPasajes.Controllers
             }
             //Retornamos el archivo con el Content Type
             return File(buffer, "application/pdf");
+        }
+
+        public FileResult GenerarExcel()
+        {
+            byte[] buffer;
+
+            using (MemoryStream ms = new MemoryStream()) //Para guardar el Excel en memoria (MemoryStream)
+            {
+                //Todo el documento excel
+                ExcelPackage ep = new ExcelPackage();
+                //Crear un hoja
+                ep.Workbook.Worksheets.Add("Reporte");
+
+                ExcelWorksheet ew = ep.Workbook.Worksheets[1];
+
+                //Ponemos nombre de las columnas
+                ew.Cells[1, 1].Value = "Id Marca";
+                ew.Cells[1, 2].Value = "Nombre";
+                ew.Cells[1, 3].Value = "Descripcion";
+                ew.Column(1).Width = 20; //Anchos de cada columna
+                ew.Column(2).Width = 40;
+                ew.Column(3).Width = 180;
+
+                //Configuramos el color de letra y fondo
+                using (var range = ew.Cells[1, 1, 1, 3]) // Dela celda 1,1 a 1,3
+                {
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Font.Color.SetColor(Color.White);
+                    range.Style.Fill.BackgroundColor.SetColor(Color.DarkRed);
+                }
+
+                //Ingresamos la data a la hoja
+                var lista = (List<MarcaCLS>)Session["lista"]; //Obtenemos la lista de la sesion
+                int nregistros = lista.Count;
+                for (int i = 0; i < nregistros; i++)
+                {
+                    ew.Cells[i + 2, 1].Value = lista[i].iidmarca; //Fila 2, columna 1
+                    ew.Cells[i + 2, 2].Value = lista[i].nombre;
+                    ew.Cells[i + 2, 3].Value = lista[i].descripcion;
+                }
+                //Guardamos en el MemoryStream, toda la hoja
+                ep.SaveAs(ms);
+                buffer = ms.ToArray(); //Guardamos el Excel en la variable buffer(Obtenemos los Byte, para poder retornarlo)
+            }
+            //Retornamos el archivo con el Content Type
+            return File(buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
     }
 }
