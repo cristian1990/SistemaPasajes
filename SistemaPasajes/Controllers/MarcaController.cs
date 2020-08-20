@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using SistemaPasajes.Models; //Colocar
 
 namespace SistemaPasajes.Controllers
@@ -32,7 +35,7 @@ namespace SistemaPasajes.Controllers
                                       nombre = marca.NOMBRE,
                                       descripcion = marca.DESCRIPCION
                                   }).ToList();
-                    //Session["lista"] = listaMarca;
+                    Session["lista"] = listaMarca; //Guardamos la listaMarca en una sesion, para el PDF
                 }
                 else //Si se ingreso una marca para filtrar
                 {
@@ -45,7 +48,7 @@ namespace SistemaPasajes.Controllers
                                       nombre = marca.NOMBRE,
                                       descripcion = marca.DESCRIPCION
                                   }).ToList();
-                    //Session["lista"] = listaMarca;
+                    Session["lista"] = listaMarca; //Guardamos la listaMarca en una sesion, para el PDF
                 }
             }
             return View(listaMarca);
@@ -173,5 +176,69 @@ namespace SistemaPasajes.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+
+
+        //Accion para generar un archivo PDF (Antes añadir la referencia a itextsharp.dll)
+        //Si quiero devolver un archivo a la vista, mi action debe ser FileResult 
+        public FileResult GenerarPDF()
+        {
+            Document doc = new Document(); //Creo el documento
+            byte[] buffer;
+
+            using (MemoryStream ms = new MemoryStream()) //Para guardar el PDF en memoria (MemoryStream)
+            {
+                PdfWriter.GetInstance(doc, ms); //Para escribir en el documento
+                doc.Open(); //Abrimos el documento
+
+                Paragraph title = new Paragraph("Lista Marca"); //Titulo
+                title.Alignment = Element.ALIGN_CENTER; //Alineamos al centro
+                doc.Add(title); //Agregamos al documento el titulo
+
+                Paragraph espacio = new Paragraph(" ");
+                doc.Add(espacio); //Agregamos al documento el espacio
+
+                //Columnas (Tabla)
+                PdfPTable table = new PdfPTable(3); //(3) numero de columnas de la tabla
+                //Anchos a las columnas
+                float[] values = new float[3] { 30, 40, 80 };
+                //Asignado esos anchos a la tabla
+                table.SetWidths(values);
+
+
+                //Creando celdas(Poniendo contenido)-color-alineado
+                //el contenido al centro
+                PdfPCell celda1 = new PdfPCell(new Phrase("Id Marca"));
+                celda1.BackgroundColor = new BaseColor(130, 130, 130);
+                celda1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+                table.AddCell(celda1);
+
+                PdfPCell celda2 = new PdfPCell(new Phrase("Nombre"));
+                celda2.BackgroundColor = new BaseColor(130, 130, 130);
+                celda2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+                table.AddCell(celda2);
+
+                PdfPCell celda3 = new PdfPCell(new Phrase("Descripcion"));
+                celda3.BackgroundColor = new BaseColor(130, 130, 130);
+                celda3.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+                table.AddCell(celda3);
+
+                //Ingresamos la data a la tabla
+                var lista = (List<MarcaCLS>)Session["lista"]; //Obtenemos la lista de la sesion
+                int nregistros = lista.Count;
+                for (int i = 0; i < nregistros; i++)
+                {
+                    table.AddCell(lista[i].iidmarca.ToString());
+                    table.AddCell(lista[i].nombre);
+                    table.AddCell(lista[i].descripcion);
+                }
+                
+                doc.Add(table); //Agregamos la tabla al documento
+                doc.Close(); //Cerramos el documento
+
+                buffer = ms.ToArray(); //Guardamos el PDF en la variable buffer (Obtenemos los Byte, para poder retornarlo)
+            }
+            //Retornamos el archivo con el Content Type
+            return File(buffer, "application/pdf");
+        }
     }
 }
