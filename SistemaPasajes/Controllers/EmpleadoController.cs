@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SistemaPasajes.Filtros;
 using SistemaPasajes.Models;
 
 namespace SistemaPasajes.Controllers
 {
+    [Acceder] //Agregamos el filtro
     public class EmpleadoController : Controller
     {
         // GET: Empleado

@@ -1,4 +1,5 @@
-﻿using SistemaPasajes.Models;
+﻿using SistemaPasajes.Filtros;
+using SistemaPasajes.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Web.Mvc;
 
 namespace SistemaPasajes.Controllers
 {
+    [Acceder] //Agregamos el filtro
     public class RolController : Controller
     {
         // GET: Rol

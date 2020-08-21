@@ -11,9 +11,11 @@ using iTextSharp.text.pdf;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SistemaPasajes.Models; //Colocar
+using SistemaPasajes.Filtros;
 
 namespace SistemaPasajes.Controllers
 {
+    [Acceder] //Agregamos el filtro
     public class MarcaController : Controller
     {
         #region Accion para Listar Datos

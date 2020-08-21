@@ -7,9 +7,11 @@ using System.Web.Mvc;
 using System.Transactions; //Lo agregue desde las referencias
 using System.Security.Cryptography;
 using System.Text; //Para Byte
+using SistemaPasajes.Filtros;
 
 namespace SistemaPasajes.Controllers
 {
+    [Acceder] //Agregamos el filtro
     public class UsuarioController : Controller
     {
         // GET: Usuario
