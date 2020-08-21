@@ -46,19 +46,17 @@
             @using (Ajax.BeginForm("Guardar", "Usuario", null, new AjaxOptions
             {
                 HttpMethod = "POST",
-                OnSuccess = "Guardar",
+                OnSuccess = "Guardar", //Mas abajo definimos este metodo
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "divError"
             }))
             {
                 @*Para enviar esta informacion al controlador*@
                 @Html.Hidden("titulo") //Vamos a asignar el valor 1 con JS
-                @Html.Hidden("nombrePersona")
+                @Html.Hidden("nombrePersonaEnviar")
                 @*@Html.TextBox("titulo")*@
                 @*@Html.TextBox("nombrePersona")*@
                 <div class="modal-body">
-                    <div>
-                        @Html.Label("Id Usuario")
-                        @Html.TextBox("iidusuario", null, new { @class = "form-control", @readOnly = true })
-                    </div>
                     <div>
                         @Html.Label("Nombre Usuario")
                         @Html.TextBox("nombreusuario", null, new { @class = "form-control" })
@@ -81,30 +79,62 @@
                     <button type="submit" class="btn btn-primary">Guardar cambios</button>
                 </div>
             }
+            <!--Para el mensaje de error-->
+            <div id="divError">
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Modal - Boostrap - Popups de confirmacion al eliminar -->
+<!--exampleModalConfirmacion se llama desde la vista parcial _TablaUsuario-->
+<div class="modal fade" id="exampleModalConfirmacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Dese guardar los cambios?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div style="padding:1em">
+                <button type="button" id="btnCerrarConfirmacion" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="EliminarRegistro()" class="btn btn-info">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
 
     function Agregar() {
-        document.getElementById("titulo").value = "1";
-        //document.getElementById("divContraOcultar").style.display = "block";
-        //document.getElementById("divUsuarioOcultar").style.display = "block";
+        Limpiar();
+        document.getElementById("titulo").value = "-1"; //Agrego el valor de -1 al Hidden
+        document.getElementById("divContraOcultar").style.display = "block"; //Muestro la contraseña al Agregar
+        document.getElementById("divUsuarioOcultar").style.display = "block"; //Muestro el usuario al Agregar
     }
 
     var iid = document.getElementById("iid");
     iid.onchange = function () { //Cada vez que haya un cambio
-        //Mando el texto de la opcion seleccionada por el usuario al Hidden "nombrePersona"
-        document.getElementById("nombrePersona").value = iid.options[iid.selectedIndex].text;
+        //Mando el texto de la opcion seleccionada por el usuario al Hidden "nombrePersonaEnviar"
+        document.getElementById("nombrePersonaEnviar").value = iid.options[iid.selectedIndex].text;
     }
 
+    //El guardar lo definimos en el OnSuccess, del Ajax, arriba
     function Guardar(rpta) {
-
-        if (rpta != 0) {
+        //0: cuando editamos pero no modificamos nada, 1: cuando queremos agregar, 2: Porque inserta y modifica (transaccion)
+        if (rpta == "0" || rpta == "1" || rpta == "2") {
+            $("#frmFiltrado").trigger("submit"); //Envio el formulario (Para refrescar la tabla)
             alert("Se ejecuto correctamente");
-            document.getElementById("btnCerrar").click();
-        } else {
+            document.getElementById("btnCerrar").click(); //Cierro el Popups
+        }
+        else {
+            if (rpta == "-1") {
+                alert("Ya existe en la base de datos");
+                document.getElementById("divError").innerHTML = ""; //Vacio, para que no se muestre el error (-1)
+            }else
             alert("Ocurrio un error");
         }
     }
@@ -112,7 +142,57 @@
     //Para el Filtrado por Nombre
     var nombrePersona = document.getElementById("nombrePersona");
     nombrePersona.onkeyup = function () { //Cuando toca una tecla
-        $("#frmFiltrado").trigger("submit"); //Envio el formulario
+        $("#frmFiltrado").trigger("submit"); //Envio el formulario (Para refrescar la tabla)
+    }
+
+    //Funcion para editar, y mostrar la info en el popups
+    function Editar(id) {
+        Limpiar();
+        $.get("Usuario/recuperarInformacion/?iidusuario=" + id, function (data) { //data tendra los datos
+            document.getElementById("nombreusuario").value = data.nombreusuario;
+            document.getElementById("iidrol").value = data.iidrol;
+            //Pongo valores por defecto ya que son Required, y me los pide si no habra error, NO se sobrescribira los datos
+            //Ya que en la Accion Guardar del controlador, no edito esas propiedades de la clase (Al Editar)
+            document.getElementById("contra").value = "1";
+            document.getElementById("iid").value = "1";
+        })
+
+        document.getElementById("titulo").value = id;
+        document.getElementById("divContraOcultar").style.display = "none"; //Oculto la contraseña al editar
+        document.getElementById("divUsuarioOcultar").style.display = "none"; //Oculto el usuario al editar
+    }
+
+    //Funcion para limpiar los datos de los input en el Popups al Editar y Agregar
+    function Limpiar() {
+        var controles = document.getElementsByClassName("form-control");
+        var control;
+        for (var i = 0; i < controles.length; i++) {
+            control = controles[i];
+            control.value = "";
+        }
+        document.getElementById("divError").innerHTML = "";
+    }
+
+    //Metodos para Eliminar un usuario
+    function Eliminar(iidusuario) {
+        document.getElementById("titulo").value = iidusuario; //Escribo en el Hidden el Id del usuario seleccionado
+    }
+
+    function EliminarRegistro() {
+
+        var iidusuario = document.getElementById("titulo").value; //Tomo del Hidden el Id del usuario
+
+        //Envio al controlador el Id a eliminar
+        $.get("Usuario/Eliminar/?idUsuario=" + iidusuario, function (data) { //data, tendra el numero de registros afectados
+
+            if (data == 1) { //1 indica que se afecto 1 fila, entonces se pudo guardar
+                $("#frmFiltrado").trigger("submit"); //Envio el formulario (Para refrescar la tabla)
+                alert("Se ejecuto correctamente");
+                document.getElementById("btnCerrarConfirmacion").click(); //Cierro el popups
+            } else {
+                alert("Ocurrio un error");
+            }
+        })
     }
 
 </script>

@@ -128,7 +128,12 @@
             document.getElementById("btnCerrar").click(); //Cierro manualmente el popup
             alert("Se agrego correctamente");
         } else {
-            alert("Ocurrio un error");
+            if (rpta == -1) { //-1 viene del controlador
+                alert("Ya existe en la base de datos");
+                document.getElementById("divError").innerHTML = ""; //Dejamos en blanco, para que no muestre el error en pantalla
+            } else {
+                alert("Ocurrio un error");
+            }
         }
     }
 

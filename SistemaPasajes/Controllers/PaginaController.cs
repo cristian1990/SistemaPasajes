@@ -95,27 +95,48 @@ namespace SistemaPasajes.Controllers
                 {
                     using (var bd = new BDPasajeEntities())
                     {
+                        int cantidad = 0;
                         //-1 cuando queremos agregar
                         if (titulo == -1)
                         {
-                            Pagina oPagina = new Pagina();
-                            oPagina.MENSAJE = oPaginaCLS.mensaje;
-                            oPagina.ACCION = oPaginaCLS.accion;
-                            oPagina.CONTROLADOR = oPaginaCLS.controlador;
-                            oPagina.BHABILITADO = 1;
-                            bd.Pagina.Add(oPagina);
-                            //SaveChanges retorna el numero de filas afectadas, y lo guardo en rpta
-                            rpta = bd.SaveChanges().ToString();
-                            //Si rpta es 0, es que no se inserto nada
-                            if (rpta == "0") rpta = string.Empty; //Sobreescribo a vacio
+                            //Para verificar que no se repita el link (mensaje)                          
+                            cantidad = bd.Pagina.Where(p => p.MENSAJE == oPaginaCLS.mensaje).Count();
+
+                            if (cantidad >= 1)
+                            {
+                                rpta = "-1"; //Se encuentra en la base de datos
+                            }
+                            else
+                            {
+                                Pagina oPagina = new Pagina();
+                                oPagina.MENSAJE = oPaginaCLS.mensaje;
+                                oPagina.ACCION = oPaginaCLS.accion;
+                                oPagina.CONTROLADOR = oPaginaCLS.controlador;
+                                oPagina.BHABILITADO = 1;
+                                bd.Pagina.Add(oPagina);
+                                //SaveChanges retorna el numero de filas afectadas, y lo guardo en rpta
+                                rpta = bd.SaveChanges().ToString();
+                                //Si rpta es 0, es que no se inserto nada
+                                if (rpta == "0") rpta = string.Empty; //Sobreescribo a vacio
+                            }
                         }
                         else //si no, queremos editar (tendra el Id del rol)
                         {
-                            Pagina oPagina = bd.Pagina.Where(p => p.IIDPAGINA == titulo).First();
-                            oPagina.MENSAJE = oPaginaCLS.mensaje;
-                            oPaginaCLS.controlador = oPaginaCLS.controlador;
-                            oPaginaCLS.accion = oPaginaCLS.accion;
-                            rpta = bd.SaveChanges().ToString();
+                            //Verifico que no se repita el link (mensaje) y que el ID sea distinto al que recibo como parametro, porque si no devolvera 1 siempre                       
+                            cantidad = bd.Pagina.Where(p => p.MENSAJE == oPaginaCLS.mensaje && p.IIDPAGINA != titulo).Count();
+                            
+                            if (cantidad >= 1)
+                            {
+                                rpta = "-1"; //Se encuentra en la base
+                            }
+                            else //Si no se encuentra en la base, editamos
+                            {
+                                Pagina oPagina = bd.Pagina.Where(p => p.IIDPAGINA == titulo).First();
+                                oPagina.MENSAJE = oPaginaCLS.mensaje;
+                                oPaginaCLS.controlador = oPaginaCLS.controlador;
+                                oPaginaCLS.accion = oPaginaCLS.accion;
+                                rpta = bd.SaveChanges().ToString();
+                            }
                         }
                     }
                 }

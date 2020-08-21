@@ -67,50 +67,98 @@ namespace SistemaPasajes.Controllers
 
         //Utilizo transacciones, porque voy a tener que manipular en 2 tablas, para insertar y actualizar
         //la de Usuario y la de cliente o Empleado
-        public int Guardar(UsuarioCLS oUsuarioCLS, int titulo) //titulo viene de la vista
+        public string Guardar(UsuarioCLS oUsuarioCLS, int titulo) //titulo viene de la vista (tendra -1 o el Id del usuario)
         {
             //Vacio es error
-            int rpta = 0; //Representa los registros afectados
+            string rpta = string.Empty; //Representa los registros afectados
 
-            try 
+            try
             {
-                using (var bd = new BDPasajeEntities())
+                if (!ModelState.IsValid) //Si el modelo NO es valido
                 {
-                    //Al agregar un usuario, realizo un Insert y un Update a la tabla Cliente o Empleado
-                    //Por ese motivo debemos utilizar Transacciones, porque hago mas de 1 operacion
-                    //Abro un bloque de transaccion
-                    using (var transaccion = new TransactionScope()) //Debo agregar una referencia
+                    var query = (from state in ModelState.Values //Obtengo los estados de cada propiedad
+                                 from error in state.Errors //Obtengo los mjes de error
+                                 select error.ErrorMessage).ToList(); //En caso de haber errores los almaceno en una lista
+                    //Formo el HTML, para mostrar los errores en la vista
+                    rpta += "<ul class='list-group'>";
+                    foreach (var item in query)
                     {
-                        if (titulo == 1) //1: significa Agregar
+                        rpta += "<li class='list-group-item'>" + item + "</li>";
+                    }
+                    rpta += "</ul>";
+                }
+                else //Si es valido
+                {
+                    int cantidad = 0;
+
+                    using (var bd = new BDPasajeEntities())
+                    {
+                        //Al agregar un usuario, realizo un Insert y un Update a la tabla Cliente o Empleado
+                        //Por ese motivo debemos utilizar Transacciones, porque hago mas de 1 operacion
+                        //Abro un bloque de transaccion
+                        using (var transaccion = new TransactionScope()) //Debo agregar una referencia
                         {
-                            Usuario oUsuario = new Usuario();
-                            oUsuario.NOMBREUSUARIO = oUsuarioCLS.nombreusuario;
-                            SHA256Managed sha = new SHA256Managed(); //Para cifrar la clave
-                            byte[] byteContra = Encoding.Default.GetBytes(oUsuarioCLS.contra); //Convierto a array de Byte
-                            byte[] byteContraCifrado = sha.ComputeHash(byteContra); //Cifro
-                            string cadenaContraCifrada = BitConverter.ToString(byteContraCifrado).Replace("-", ""); //Convierto a cadena, para guardar en la BD (Saco los -)
-                            oUsuario.CONTRA = cadenaContraCifrada; //Almaceno la contraseña cifrada
-                            oUsuario.TIPOUSUARIO = oUsuarioCLS.nombrePersona.Substring(oUsuarioCLS.nombrePersona.Length - 2, 1); //Para obtener la penultima posicion ("C" o "E")
-                            oUsuario.IID = oUsuarioCLS.iid;
-                            oUsuario.IIDROL = oUsuarioCLS.iidrol;
-                            oUsuario.bhabilitado = 1; //Habilitamos el usuario
-                            bd.Usuario.Add(oUsuario);
-
-                            //Hacemos la 2da. operacion
-                            //Verificamos que tipo de usuario es (Cliente o Empleado)
-                            if (oUsuario.TIPOUSUARIO.Equals("C")) //Si es cliente
+                            if (titulo.Equals(-1)) //1: significa Agregar
                             {
-                                Cliente oCliente = bd.Cliente.Where(p => p.IIDCLIENTE.Equals(oUsuarioCLS.iid)).First(); //Buscamos el cliente
-                                oCliente.bTieneUsuario = 1; //Indicamos que ya tiene Usuario en la BD
-                            }
-                            else //Si es empleado
-                            {
-                                Empleado oEmpleado = bd.Empleado.Where(p => p.IIDEMPLEADO.Equals(oUsuarioCLS.iid)).First();
-                                oEmpleado.bTieneUsuario = 1;
-                            }
+                                //Para saber si el usuario se repite en la base
+                                cantidad = bd.Usuario.Where(p => p.NOMBREUSUARIO == oUsuarioCLS.nombreusuario).Count();
+                                if (cantidad >= 1)
+                                {
+                                    rpta = "-1"; //Ya esta en la base
+                                }
+                                else
+                                {
+                                    Usuario oUsuario = new Usuario();
+                                    oUsuario.NOMBREUSUARIO = oUsuarioCLS.nombreusuario;
+                                    SHA256Managed sha = new SHA256Managed(); //Para cifrar la clave
+                                    byte[] byteContra = Encoding.Default.GetBytes(oUsuarioCLS.contra); //Convierto a array de Byte
+                                    byte[] byteContraCifrado = sha.ComputeHash(byteContra); //Cifro
+                                    string cadenaContraCifrada = BitConverter.ToString(byteContraCifrado).Replace("-", ""); //Convierto a cadena, para guardar en la BD (Saco los -)
+                                    oUsuario.CONTRA = cadenaContraCifrada; //Almaceno la contraseña cifrada
+                                    oUsuario.TIPOUSUARIO = oUsuarioCLS.nombrePersonaEnviar.Substring(oUsuarioCLS.nombrePersonaEnviar.Length - 2, 1); //Para obtener la penultima posicion ("C" o "E")
+                                    oUsuario.IID = oUsuarioCLS.iid;
+                                    oUsuario.IIDROL = oUsuarioCLS.iidrol;
+                                    oUsuario.bhabilitado = 1; //Habilitamos el usuario
+                                    bd.Usuario.Add(oUsuario);
 
-                            rpta = bd.SaveChanges(); //Dentro de la transaccion, no funciona el SaveChanges
-                            transaccion.Complete(); //Aca recien se guarda en la BD                     
+                                    //Hacemos la 2da. operacion
+                                    //Verificamos que tipo de usuario es (Cliente o Empleado)
+                                    if (oUsuario.TIPOUSUARIO.Equals("C")) //Si es cliente
+                                    {
+                                        Cliente oCliente = bd.Cliente.Where(p => p.IIDCLIENTE.Equals(oUsuarioCLS.iid)).First(); //Buscamos el cliente
+                                        oCliente.bTieneUsuario = 1; //Indicamos que ya tiene Usuario en la BD
+                                    }
+                                    else //Si es empleado
+                                    {
+                                        Empleado oEmpleado = bd.Empleado.Where(p => p.IIDEMPLEADO.Equals(oUsuarioCLS.iid)).First();
+                                        oEmpleado.bTieneUsuario = 1;
+                                    }
+
+                                    rpta = bd.SaveChanges().ToString(); //Dentro de la transaccion, no funciona el SaveChanges
+                                    if (rpta == "0") rpta = ""; //Si es 0, no se afecto filas entonces hubo un error (Al editar se admite 0)
+                                    transaccion.Complete(); //Aca recien se guarda en la BD                     
+                                }
+                            }
+                            else //Si titulo es mayor a 1, se quiere editar
+                            {
+                                //Para saber si el usuario se repite en la base, que tenga distinto Id al del parametro
+                                cantidad = bd.Usuario.Where(p => p.NOMBREUSUARIO == oUsuarioCLS.nombreusuario
+                                && p.IIDUSUARIO != titulo).Count();
+
+                                if (cantidad >= 1)
+                                {
+                                    rpta = "-1";
+                                }
+                                else
+                                {
+                                    //Editar
+                                    Usuario ousuario = bd.Usuario.Where(p => p.IIDUSUARIO == titulo).First();  //Busco por el Id que viene en Titulo
+                                    ousuario.IIDROL = oUsuarioCLS.iidrol;
+                                    ousuario.NOMBREUSUARIO = oUsuarioCLS.nombreusuario;
+                                    rpta = bd.SaveChanges().ToString(); //Devolveria 0 o 1, dependiendo de las filas que afecto
+                                    transaccion.Complete();
+                                }
+                            }
                         }
                     }
                 }
@@ -118,9 +166,9 @@ namespace SistemaPasajes.Controllers
             catch (Exception ex)
             {
                 string error = ex.Message;
-                rpta = 0;
+                rpta = ""; //Sobreescribimos a vacio
             }
-
+            //Se envia la rpta, luego la capturamos con JS
             return rpta;
         }
 
@@ -134,7 +182,7 @@ namespace SistemaPasajes.Controllers
             using (var bd = new BDPasajeEntities())
             {
                 //Si es null, osea no se ingreso nombre para filtrar, entonces muestro todas las listas de usuarios que sean clientes o empleados
-                if (oUsuarioCLS.nombrePersona == null) 
+                if (oUsuarioCLS.nombrePersona == null)
                 {
                     List<UsuarioCLS> listaUsuarioCliente = (from usuario in bd.Usuario
                                                             join cliente in bd.Cliente
@@ -228,6 +276,45 @@ namespace SistemaPasajes.Controllers
             }
             //Envio a la vista parcial la lista de usuarios
             return PartialView("_TablaUsuario", listaUsuario);
+        }
+
+        //Funcion para recuperar info por su ID y mostrarla en el Popups
+        public JsonResult recuperarInformacion(int iidusuario)
+        {
+            UsuarioCLS oUsuarioCLS = new UsuarioCLS();
+
+            using (var bd = new BDPasajeEntities())
+            {
+                Usuario oUsuario = bd.Usuario.Where(p => p.IIDUSUARIO == iidusuario).First(); //Busco la entidad por Id
+                oUsuarioCLS.nombreusuario = oUsuario.NOMBREUSUARIO; //Asignamos los valores
+                oUsuarioCLS.iidrol = (int)oUsuario.IIDROL;
+            }
+
+            //Serializo a JSON, para luego tomarlo de la vista
+            return Json(oUsuarioCLS, JsonRequestBehavior.AllowGet);
+        }
+
+        //Accion para eliminar Usuarios de manera logica
+        public int Eliminar(int idUsuario) //El id viene de la vista parcial
+        {
+            int rpta = 0; //0 es error
+
+            try
+            {
+                using (BDPasajeEntities bd = new BDPasajeEntities())
+                {
+                    Usuario oUsuario = bd.Usuario.Where(p => p.IIDUSUARIO == idUsuario).First(); //Busco el usuario por su Id
+                    oUsuario.bhabilitado = 0; //Eliminacion logica
+                    rpta = bd.SaveChanges(); //rpta tendra 1 si se pudo guardar
+                }
+            }
+            catch (Exception ex)
+            {
+                rpta = 0; //Sobrescribo a 0
+            }
+
+            //Retorno 0 o 1, dependiedo si se pudo guardar o no (Lo tomo en la vista Index con JS)
+            return rpta;
         }
 
 

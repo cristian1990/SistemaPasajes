@@ -107,24 +107,48 @@ namespace SistemaPasajes.Controllers
                 {
                     using (var bd = new BDPasajeEntities())
                     {
+                        int cantidad = 0;
+
                         if (titulo == -1) //Si es -1, se quiere agregar
                         {
-                            RolPagina oRolPagina = new RolPagina();
-                            oRolPagina.IIDROL = oRolPaginaCLS.iidrol;
-                            oRolPagina.IIDPAGINA = oRolPaginaCLS.iidpagina;
-                            oRolPagina.BHABILITADO = 1;
-                            bd.RolPagina.Add(oRolPagina);
-                            //SaveChanges: devuelve el numero de registros afectados
-                            rpta = bd.SaveChanges().ToString();
-                            //En guardar no se permite que la rpta sea 0, pero si en editar
-                            if (rpta == "0") rpta = ""; //Sobrescribimos el valor
+                            //Verifico si se repite el Rol y pagina (Mensaje)
+                            cantidad = bd.RolPagina.Where(p => p.IIDROL == oRolPaginaCLS.iidrol && p.IIDPAGINA == oRolPaginaCLS.iidpagina).Count();
+
+                            if (cantidad >= 1)
+                            {
+                                rpta = "-1"; //Existe en la base
+                            }
+                            else //Si no existe, Agregamos
+                            {
+                                RolPagina oRolPagina = new RolPagina();
+                                oRolPagina.IIDROL = oRolPaginaCLS.iidrol;
+                                oRolPagina.IIDPAGINA = oRolPaginaCLS.iidpagina;
+                                oRolPagina.BHABILITADO = 1;
+                                bd.RolPagina.Add(oRolPagina);
+                                //SaveChanges: devuelve el numero de registros afectados
+                                rpta = bd.SaveChanges().ToString();
+                                //En guardar no se permite que la rpta sea 0, pero si en editar
+                                if (rpta == "0") rpta = ""; //Sobrescribimos el valor
+                            }                         
                         }
                         else //Si no, si intentamos editar
                         {
-                            RolPagina oRolPagina = bd.RolPagina.Where(p => p.IIDROLPAGINA == titulo).First(); //Buscamos la entidad por su ID
-                            oRolPagina.IIDROL = oRolPaginaCLS.iidrol; //Asignamos el nuevo valor
-                            oRolPagina.IIDPAGINA = oRolPaginaCLS.iidpagina;
-                            rpta = bd.SaveChanges().ToString();
+                            //Verifico si se repite el Rol y pagina (Mensaje) y que sea distindo al Id recibido
+                            cantidad = bd.RolPagina.Where(p => p.IIDROL == oRolPaginaCLS.iidrol
+                            && p.IIDPAGINA == oRolPaginaCLS.iidpagina
+                            && p.IIDROLPAGINA != titulo).Count();
+
+                            if (cantidad >= 1)
+                            {
+                                rpta = "-1"; //Existe en la base
+                            }
+                            else
+                            {
+                                RolPagina oRolPagina = bd.RolPagina.Where(p => p.IIDROLPAGINA == titulo).First();
+                                oRolPagina.IIDROL = oRolPaginaCLS.iidrol;
+                                oRolPagina.IIDPAGINA = oRolPaginaCLS.iidpagina;
+                                rpta = bd.SaveChanges().ToString();
+                            }
                         }
                     }
                 }

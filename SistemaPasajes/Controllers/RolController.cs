@@ -36,7 +36,7 @@ namespace SistemaPasajes.Controllers
             using (var bd = new BDPasajeEntities())
             {
                 if (nombreRol == null) //Si no se ingreso nada para filtrar
-                { 
+                {
                     //Listo todos los roles
                     listaRol = (from rol in bd.Rol
                                 where rol.BHABILITADO == 1
@@ -59,7 +59,7 @@ namespace SistemaPasajes.Controllers
                                     descripcion = rol.DESCRIPCION
                                 }).ToList();
                 }
-                    
+
             }
             //Retorno la Vista Parcial, y envio la lista de Roles
             return PartialView("_TablaRol", listaRol);
@@ -89,27 +89,49 @@ namespace SistemaPasajes.Controllers
                 {
                     using (var bd = new BDPasajeEntities())
                     {
+                        int cantidad = 0;
+
                         //Si titulo = -1, es que intento agregar
                         if (titulo.Equals(-1)) //Este -1, lo recibo del Html.Hidden("titulo") del Index
                         {
-                            Rol oRol = new Rol();
-                            oRol.NOMBRE = oRolCLS.nombre;
-                            oRol.DESCRIPCION = oRolCLS.descripcion;
-                            oRol.BHABILITADO = 1;
-                            bd.Rol.Add(oRol);
-                            //SaveChanges, devuelve un int del numero de filas afectadas
-                            rpta = bd.SaveChanges().ToString(); //Almaceno el numero de filas afectadas
-                            
-                            //si rpta es 0, es porque no se almaceno nada en la BD
-                            if (rpta == "0") rpta = string.Empty; //Sobreescribo con vacio para indicar error
+                            //Verificamos cuantas veces se repite el nombre Rol que queremos ingresar
+                            cantidad = bd.Rol.Where(p => p.NOMBRE == oRolCLS.nombre).Count();
+
+                            if (cantidad >= 1)
+                            {
+                                rpta = "-1"; //-1 ya existe en la BD
+                            }
+                            else
+                            {
+                                Rol oRol = new Rol();
+                                oRol.NOMBRE = oRolCLS.nombre;
+                                oRol.DESCRIPCION = oRolCLS.descripcion;
+                                oRol.BHABILITADO = 1;
+                                bd.Rol.Add(oRol);
+                                //SaveChanges, devuelve un int del numero de filas afectadas
+                                rpta = bd.SaveChanges().ToString(); //Almaceno el numero de filas afectadas
+
+                                //si rpta es 0, es porque no se almaceno nada en la BD
+                                if (rpta == "0") rpta = string.Empty; //Sobreescribo con vacio para indicar error
+                            }
                         }
                         else //Si el titulo es >=1, es que quiero editar
                         {
-                            Rol oRol = bd.Rol.Where(p => p.IIDROL == titulo).First(); //Buscamos el rol a editar
-                            oRol.NOMBRE = oRolCLS.nombre;
-                            oRol.DESCRIPCION = oRolCLS.descripcion;
-                            //Si no se edita ningun valor el SaveChanges, valdra cero, si no vale el numero de filas afectadas
-                            rpta = bd.SaveChanges().ToString();
+                            //Verificamos cuantas veces se repite el nombre Rol que queremos ingresar y el Id debe ser distinto al seleccionado
+                            cantidad = bd.Rol.Where(p => p.NOMBRE == oRolCLS.nombre && p.IIDROL != titulo).Count();
+
+                            if (cantidad >= 1)
+                            {
+                                rpta = "-1";
+                            }
+                            else
+                            {
+                                Rol oRol = bd.Rol.Where(p => p.IIDROL == titulo).First(); //Buscamos el rol a editar
+                                oRol.NOMBRE = oRolCLS.nombre;
+                                oRol.DESCRIPCION = oRolCLS.descripcion;
+                                //Si no se edita ningun valor el SaveChanges, valdra cero, si no vale el numero de filas afectadas
+                                rpta = bd.SaveChanges().ToString();
+                            }
                         }
                     }
                 }
@@ -118,8 +140,8 @@ namespace SistemaPasajes.Controllers
             {
                 rpta = string.Empty;
             }
-           //Si todo se guardo bien enviara a la vista un "1", porque se afecto 1 fila
-           return rpta;
+            //Si todo se guardo bien enviara a la vista un "1", porque se afecto 1 fila
+            return rpta;
         }
 
         //Busco la entidad para llenar los datos en el Popups Editar
