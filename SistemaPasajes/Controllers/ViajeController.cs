@@ -193,11 +193,9 @@ namespace SistemaPasajes.Controllers
                 //año-mes-dia  (El navegador pide)
                 //dia-mes-anio (Viene de BD)
                 //Por eso hago una conversion del formato de la fecha
-                oViajeCls.fechaViajeCadena = oViaje.FECHAVIAJE != null ?
-                    ((DateTime)oViaje.FECHAVIAJE).ToString("yyyy-MM-ddTHH:mm") : "";
+                oViajeCls.fechaViajeCadena = oViaje.FECHAVIAJE != null ? ((DateTime)oViaje.FECHAVIAJE).ToString("yyyy-MM-ddTHH:mm") : ""; //Si NO es NULL Lo casteo a formato fecha o lo dejo vacio si no se puede
                 oViajeCls.numeroAsientosDisponibles = (int)oViaje.NUMEROASIENTOSDISPONIBLES;
                 oViajeCls.nombreFoto = oViaje.nombrefoto;
-
                 oViajeCls.extension = Path.GetExtension(oViaje.nombrefoto); //Obtenemos la extension de la imagen
                 oViajeCls.fotoRecuperCadena = Convert.ToBase64String(oViaje.FOTO); //Convertimos la foto a Base64
 

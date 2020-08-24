@@ -1,0 +1,9 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    <!--La sesion fue creada en el controler (No es bueno utilizar muchas sesiones)-->
+    string nombreCompleto = (string)Session["nombreCompleto"];
+}
+
+<h2>Bienvenido @nombreCompleto  </h2>
+

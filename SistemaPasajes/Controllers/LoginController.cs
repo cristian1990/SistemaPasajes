@@ -1,4 +1,5 @@
-﻿using SistemaPasajes.Models;
+﻿using SistemaPasajes.ClasesAuxiliares;
+using SistemaPasajes.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,13 @@ namespace SistemaPasajes.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+
+        public ActionResult CerrarSession()
+        {
+            Session["Usuario"] = null; //Elimino la sesion
+            Session["Rol"] = null;
+            return RedirectToAction("Index"); //Aca esta la interfaz de Login
         }
 
         public string Login(UsuarioCLS oUsuario)
@@ -60,13 +68,14 @@ namespace SistemaPasajes.Controllers
                         //Almaceno todo el objeto Usuario, se podra usar desde cualquier lado
                         Session["Usuario"] = ousuario;
 
-                        if (ousuario.TIPOUSUARIO == "C")
+                        if (ousuario.TIPOUSUARIO == "C") //Si es un cliente
                         {
+                            //Buscamos el cliente logueado
                             Cliente oCliente = bd.Cliente.Where(p => p.IIDCLIENTE == ousuario.IID).First();
+                            //Creamos una sesion para permanecer los datos del cliente y mostrarlos al ingresar (se podria utilizar un ViewBag)
                             Session["nombreCompleto"] = oCliente.NOMBRE + " " + oCliente.APPATERNO + " " + oCliente.APMATERNO;
-
                         }
-                        else
+                        else //Si es un Empleado
                         {
                             Empleado oEmpleado = bd.Empleado.Where(p => p.IIDEMPLEADO == ousuario.IID).First();
                             Session["nombreCompleto"] = oEmpleado.NOMBRE + " " + oEmpleado.APPATERNO + " " + oEmpleado.APMATERNO;
@@ -95,7 +104,63 @@ namespace SistemaPasajes.Controllers
                     }
                 }
             }
+            return rpta;
+        }
 
+        public string RecuperarContra(string IIDTIPO, string correo, string telefonoCelular)
+        {
+            string rpta = ""; //Vacio es error
+
+            using (var bd = new BDPasajeEntities())
+            {
+                int cantidad = 0;
+                int iidcliente;
+
+                if (IIDTIPO == "C") //Si es un cliente
+                {
+                    //Para verificar si existe un cliente con esa informacion
+                    cantidad = bd.Cliente.Where(p => p.EMAIL == correo && p.TELEFONOCELULAR == telefonoCelular).Count();
+                }
+                if (cantidad == 0)
+                {
+                    rpta = "No existe una persona registrada con esa informacion";
+                }
+                else //Si encontramos el usuario en la BD
+                {
+                    //Obtenemos el Id del cliente
+                    iidcliente = bd.Cliente.Where(p => p.EMAIL == correo && p.TELEFONOCELULAR == telefonoCelular).First().IIDCLIENTE;               
+                    //Verificar si el cliente tiene Usuario
+                    int nveces = bd.Usuario.Where(p => p.IID == iidcliente && p.TIPOUSUARIO == "C").Count();
+                    
+                    if (nveces == 0) 
+                    {
+                        rpta = "No tiene usuario";
+                    }
+                    else //Si el cliente tiene usuario
+                    {
+                        //Obtener el usuario por su Id
+                        Usuario ousuario = bd.Usuario.Where(p => p.IID == iidcliente && p.TIPOUSUARIO == "C").First();
+                       
+                        //Modificar su clave
+                        Random ra = new Random();
+                        int n1 = ra.Next(0, 9); //Next: Devuelve un numero aleatorio entre 0 y 9, no negativo
+                        int n2 = ra.Next(0, 9);
+                        int n3 = ra.Next(0, 9);
+                        int n4 = ra.Next(0, 9);
+                        string nuevaContra = n1.ToString() + n2 + n3 + n4;
+
+                        //Cifrar clave
+                        SHA256Managed sha = new SHA256Managed();
+                        byte[] byteContra = Encoding.Default.GetBytes(nuevaContra);
+                        byte[] byteContraCifrado = sha.ComputeHash(byteContra);
+                        string cadenaContraCifrada = BitConverter.ToString(byteContraCifrado).Replace("-", "");
+                        
+                        ousuario.CONTRA = cadenaContraCifrada; //Almaceno la nueva clave cifrada (la que se envia al usuario)
+                        rpta = bd.SaveChanges().ToString(); //rpta, tendra un "" o "1" dependiendo si pudo guardar 
+                        Correo.enviarCorreo(correo, "Recuperar Clave", "Se reseteo su clave , ahora su clave es :" + nuevaContra, "");
+                    }
+                }
+            }
             return rpta;
         }
     }

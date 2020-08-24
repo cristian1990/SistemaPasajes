@@ -1,0 +1,186 @@
+﻿@using SistemaPasajes.Models;
+@model List<ReservaCLS>
+
+@{
+    ViewBag.Title = "Index";
+    string[] arrayId = { };
+    string[] arrayCantidad = { };
+
+    //Esto viene del controlador
+    if (ViewBag.listaId != null && ViewBag.listaCantidad != null)
+    {
+        //7,4,5
+        // .split(',')  [7,4,5]
+        //6&5&9
+        //.split('&')  [6,5,9]
+        //Almaceno en un array, la informacion traida de las Cookie
+        arrayId = ((string)ViewBag.listaCantidad).Split('{');
+        arrayCantidad = ((string)ViewBag.listaCantidad).Split('{');
+    }
+}
+
+<h2>Index</h2>
+
+<style>
+    .agregado {
+        background-color: #01230e;
+        position: relative;
+        color: white !important;
+        font-weight: bold;
+    }
+
+        .agregado::after {
+            position: absolute;
+            content: "Reservado";
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: green;
+            font-size: 2em;
+            color: white;
+            text-align: center;
+        }
+</style>
+
+<!--Utiliza CSS Grid-->
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; grid-gap:1em; grid-auto-rows:520px; margin-top:1em" id="divReserva">
+    <!--Por cada viaje disponible-->
+    @foreach (var reserva in Model)
+    {
+        //Este div tendra cada elemento Viaje (cada card, tendra un ID distinto)
+    <div id="@reserva.iidViaje" style="border:1px solid #666; border-radius:1px; padding:2px"
+
+        @{
+            string clase;
+            bool readOnly = false;
+            //El valor de la cantidad de reservas
+            string valor = "";
+            if (arrayId.Contains(reserva.iidViaje.ToString()))
+            {
+                clase = "agregado"; //Nombre de la clase de CSS
+                readOnly = true;
+                //6{7{8
+                //[6,7,8]  arrayId
+                //[]  arrayCantidad
+
+                //Obtengo el indice del donde se encuantra el Viaje a reservado
+                int indice = Array.IndexOf(arrayId, reserva.iidViaje.ToString());
+                valor = arrayCantidad[indice].Split('*')[0]; //Porque cantidad esta en la posicion 0
+            }
+            else
+            {
+                clase = "sinagregado";
+                readOnly = false;
+                valor = "";
+            }
+        }
+
+        class="@clase"
+        >
+
+        @{
+            //Para obtener la imagen de cada viaje
+            string base64Foto = Convert.ToBase64String(reserva.foto);
+            //.jpg , .png (sin el punto ".")
+            string extensionArchivo = Path.GetExtension(reserva.nombreArchivo).Substring(1);//jpg, png
+            string cadena = "data:image/" + extensionArchivo + ";base64," + base64Foto;
+        }
+        <!--Para mostrar la imagen-->
+        <img src="@cadena" style="width:100%; height:auto" />
+        <div style="padding:1em ; display:flex;justify-content:space-around">
+            <!--Mostramos lugar de origen y destino-->
+            <label>Origen : @reserva.lugarOrigen</label>
+            <label>Destino : @reserva.lugarDestino</label>
+        </div>
+        <div style="padding:1em">
+            <p>Placa Bus : @reserva.nombreBus (@reserva.descripcionBus)</p>
+            <p>Fecha Viaje : @reserva.fechaViaje</p>
+            <p style="font-weight:bold">Precio: $/@reserva.precio</p>
+            <p>Disponible: @reserva.asientosDisponibles / @reserva.totalAsientos</p>
+            <!--Validamos que no se pueda solicitar mas asientos que los disponibles-->
+            Solicitar : <input value="@valor" readonly="@readOnly" id="txt_@reserva.iidViaje" type="number" min="0" max="@reserva.asientosDisponibles" />
+
+            <div style="margin-top:1em;text-align:center">
+                <button class="btn btn-primary"
+                        onclick="Reservar(@reserva.iidViaje,@reserva.asientosDisponibles,
+                                '@reserva.fechaViaje','@reserva.lugarOrigen', '@reserva.lugarDestino',
+                                @reserva.precio.ToString().Replace(',','.') ,@reserva.iidBus)">
+                    Aceptar
+                </button>
+                <!--Al cancelar quito el vieje con un ID determinado-->
+                <button class="btn btn-danger" onclick="Quitar(@reserva.iidViaje)">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+
+<script>
+
+    //Funcion para realizar la reserva de un Viaje
+    function Reservar(idViaje, asientosDisponibles, fechaViaje, lugarOrigen, lugarDestino, precio, iidBus) {
+
+        //Numero pasajes a comprar
+        var numeroPasajes = document.getElementById("txt_" + idViaje).value;
+        if (numeroPasajes <= 0) {
+            alert("Tiene que ser una cantidad mayor a 0");
+            return; //Dale de la funcion
+        }
+        if (numeroPasajes == "") {
+            alert("No puede ingresar un valor vacio");
+            return;
+        }
+
+        if (numeroPasajes > asientosDisponibles) {
+            alert("No puede solicitar mas de lo disponible que es " + asientosDisponibles);
+            return;
+        }
+
+        //Aqui hacemos el confirm de la reserva
+        if (confirm("Desea realmente reservar") == 1) {
+
+            if (document.getElementById(idViaje).classList.contains("agregado")) {
+                alert("Ya se agrego");
+            }
+            else {
+                document.getElementById(idViaje).classList.add("agregado");
+                document.getElementById("txt_" + idViaje).readOnly = true; //No permite editar la cantidad si ya se agrego
+                //Armo la URL, para pasar al controlador
+                var url = "Reserva/Agregarcookie/?idViaje=" + idViaje + "&cantidad=" + numeroPasajes +
+                    "&fechaViaje=" + fechaViaje + "&lugarOrigen=" + lugarOrigen + "&lugarDestino=" + lugarDestino +
+                    "&precio=" + precio + "&iidBus=" + iidBus;
+                //Llamo al controlador
+                $.get(url, function (data) { //data tendra el resultado de la peticion get ("" o "OK")
+                    if (data == "OK") {
+                        alert("Se agrego correctamente");
+                    } else {
+                        alert("Ocurrio un error");
+                    }
+                })
+            }
+        }
+    }
+
+    function Quitar(idViaje) {
+
+        if (confirm("Desea realmente cancelar la reserva de ese viaje?") == 1) {
+            //Si contiene la clase de CSS "agregado"
+            if (document.getElementById(idViaje).classList.contains("agregado")) {
+                document.getElementById(idViaje).classList.remove("agregado");
+                document.getElementById("txt_" + idViaje).value = ""; //Quito la cantidad ingresada
+                document.getElementById("txt_" + idViaje).readOnly = false; //Para que se pueda editar
+
+                var url = "Reserva/QuitarCookie/?idViaje=" + idViaje; // Creo la Url
+                $.get(url, function (data) { //Consulto al servidor (Data tendra la respuesta)
+                    if (data == "OK") { //data tendra "OK" o "" (vacio)
+                        alert("Se realizo correctamente");
+                    } else {
+                        alert("Ocurrio un error");
+                    }
+                })
+            }
+        }
+    }
+</script>

@@ -15,16 +15,17 @@ namespace SistemaPasajes.Filtros
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             //Busco el objeto almacenado en la sesion
-            var usuario = HttpContext.Current.Session["Usuario"]; 
-
-            List<MenuCLS> roles = (List<MenuCLS>)HttpContext.Current.Session["Rol"];
+            var usuario = HttpContext.Current.Session["Usuario"];
 
             string nombreControlador = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName;
-            string accion = filterContext.ActionDescriptor.ActionName;
+            string nombreAccion = filterContext.ActionDescriptor.ActionName;
+
+            //Para no permitir que por la URL se pueda ingresar sin los roles
+            List<MenuCLS> roles = (List<MenuCLS>)HttpContext.Current.Session["Rol"];
             int cantidad = roles.Where(p => p.nombreControlador == nombreControlador).Count();
 
             //Si session es nulo (No se logueo), entonces redireccionamos al Login
-            if (usuario == null || cantidad == 0)
+            if (usuario == null || cantidad == 0) //Si no tiene en la lista el controlador asignado o la sesion es null
             {
                 filterContext.Result = new RedirectResult("~/Login/Index");
             }

@@ -24,7 +24,6 @@
     HttpMethod = "POST",
     UpdateTargetId = "divRolPagina", //En la etiqueta con este ID, se coloca la respuesta del servidor
     InsertionMode = InsertionMode.Replace, //Se va a reemplazar por lo que se trae del servidor
-    OnSuccess = "Filtrar", //Funcion de JS  a ejecutar
 
 }, new { @id = "frmFiltrado" })) //Indico el ID del formulario
 {
@@ -102,7 +101,7 @@
 
 <script>
 
-    var iidrol = document.getElementById("iidrol");
+    var iidrol = document.getElementById("iidrolFiltro");
     iidrol.onchange = function () { //Si hay un cambio en el Combo
         $("#frmFiltrado").trigger("submit"); //Envio el formulario
     }

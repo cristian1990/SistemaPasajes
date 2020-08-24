@@ -78,13 +78,14 @@
 
                 <button class="btn btn-lg btn-primary btn-block btn-signin" id="IngresoLog" type="submit">Entrar</button>
                 <div class="opcioncontra"><a id="btnOlvideContra" data-toggle="modal" data-target="#exampleModal">Olvidaste tu contraseña?</a></div>
+                
                 <!--Tendra la respuesta del controlador 1 o 0, dependiendo si existe en la BD-->
                 <div id="divRespuesta"></div>
             }
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal - Bootstrap -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -97,7 +98,7 @@
                 @using (Ajax.BeginForm("RecuperarContra", "Login", null, new AjaxOptions
                 {
                     HttpMethod = "POST",
-                    OnSuccess = "Recuperar",
+                    OnSuccess = "Recuperar", //Si todo va bien
                     UpdateTargetId = "error"
                 }))
                 {
@@ -105,8 +106,9 @@
                     <div class="modal-body">
                         <div>
                             @Html.Label("Indicar si es cliente o empleado")
-                            <select name="IIDTIPO" id="IIDTIPO">
+                            <select name="IIDTIPO" id="IIDTIPO"> <!--IIDTIPO, se enviara al controlador-->
                                 <option value="C">Cliente</option>
+                                <option value="E">Empleado</option>
                             </select>
                         </div>
                         <div>
@@ -120,7 +122,7 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="btnClose" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="btnCerrar" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
                 }
@@ -128,29 +130,30 @@
             </div>
         </div>
     </div>
-    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script src="~/scripts/jquery.unobtrusive-ajax.js"></script>
-    <script src="~/scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <!--Agregamos para poder utilizar AJAX-->
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 </html>
 
 <script>
 
-    //function Recuperar(rpta) {
-    //    if (rpta == "1") {
-    //        alert("Se envio la clave al correo");
-    //        document.getElementById("btnClose").click();
+    function Recuperar(rpta) {
+        if (rpta == "1") { //rpta viene del controlador, "1" indica que se guardo correctamente
+            alert("Se envio la clave al correo");
+            document.getElementById("btnCerrar").click(); //Cerramos el Popups
+        } else {
+            alert("Ocurrio un error");
+        }
+    }
 
-    //    } else {
-    //        alert("Ocurrio un error");
-    //    }
-    //}
-
+    //Para manejar el ingreso del Login
     function Ingresar(rpta) {
 
         if (rpta == "1") { //1 significa que se encontro en la BD
             document.location.href = "@Url.Action("Index", "PantallaPrincipal")"; //Redireccionamos
-            document.getElementById("divRespuesta").innerHTML = "";
+            document.getElementById("divRespuesta").innerHTML = ""; //Vaciamos para no mostrar la respueta (-1)
         } else {
             alert("Usuario o contraseña incorrecta");
         }

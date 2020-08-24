@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using SistemaPasajes.Models;
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -17,17 +19,27 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Marca", "Index", "Marca", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Sucursal", "Index", "Sucursal", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Cliente", "Index", "Cliente", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Empleado", "Index", "Empleado", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Bus", "Index", "Bus", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Viaje", "Index", "Viaje", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Tipo Usuario", "Index", "TipoUsuario", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Usuario", "Index", "Usuario", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Rol", "Index", "Rol", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Pagina", "Index", "Pagina", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Rol Pagina", "Index", "RolPagina", new { area = "" }, new { @class = "navbar-brand" })
+
+                <!--Vamos a mostrar las vistas de acuerdo a los perfiles de cada usuario-->
+                @foreach (MenuCLS oMenuCLS in (List<MenuCLS>)Session["Rol"])  //Rol tendra la lista de roles del usuario
+                {
+                    @Html.ActionLink(oMenuCLS.mensaje, oMenuCLS.nombreAccion, oMenuCLS.nombreControlador, new { area = "" }, new { @class = "navbar-brand" })
+                }
+
+                @Html.ActionLink("Cerrar Session", "CerrarSession", "Login", new { area = "" }, new { @class = "navbar-brand" })
+
+                <!--Ya no va a ser estatico-->
+                @*@Html.ActionLink("Marca", "Index", "Marca", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Sucursal", "Index", "Sucursal", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Cliente", "Index", "Cliente", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Empleado", "Index", "Empleado", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Bus", "Index", "Bus", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Viaje", "Index", "Viaje", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Tipo Usuario", "Index", "TipoUsuario", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Usuario", "Index", "Usuario", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Rol", "Index", "Rol", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Pagina", "Index", "Pagina", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Rol Pagina", "Index", "RolPagina", new { area = "" }, new { @class = "navbar-brand" })*@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
