@@ -14,8 +14,8 @@ namespace SistemaPasajes.Models
         public string lugarOrigen { get; set; }
         public string lugarDestino { get; set; }
         public decimal precio { get; set; }
-        public DateTime? fechaViaje { get; set; }
-        public DateTime? fechaVenta { get; set; }
+        public DateTime fechaViaje { get; set; }
+        public DateTime fechaVenta { get; set; }
         public string nombreBus { get; set; }
         public string descripcionBus { get; set; }
         public int asientosDisponibles { get; set; }

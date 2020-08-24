@@ -238,6 +238,7 @@
     <Compile Include="Controllers\PaginaController.cs" />
     <Compile Include="Controllers\PantallaPrincipalController.cs" />
     <Compile Include="Controllers\ReservaController.cs" />
+    <Compile Include="Controllers\ReservasRealizadasController.cs" />
     <Compile Include="Controllers\RolController.cs" />
     <Compile Include="Controllers\RolPaginaController.cs" />
     <Compile Include="Controllers\SucursalController.cs" />
@@ -297,6 +298,7 @@
     </Compile>
     <Compile Include="Models\PaginaCLS.cs" />
     <Compile Include="Models\ReservaCLS.cs" />
+    <Compile Include="Models\ReservasRealizadasCLS.cs" />
     <Compile Include="Models\Rol.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
@@ -312,9 +314,6 @@
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SucursalCLS.cs" />
-    <Compile Include="Models\sysdiagrams.cs">
-      <DependentUpon>DBPasajes.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\TipoBus.cs">
       <DependentUpon>DBPasajes.tt</DependentUpon>
     </Compile>
@@ -395,6 +394,7 @@
     <Content Include="Views\Reserva\Index.cshtml" />
     <Content Include="Views\MisReservas\Index.cshtml" />
     <Content Include="Views\MisReservas\_TablaMisReservas.cshtml" />
+    <Content Include="Views\ReservasRealizadas\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

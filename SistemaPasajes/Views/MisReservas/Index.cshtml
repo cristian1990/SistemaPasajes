@@ -1,7 +1,68 @@
-﻿
+﻿@using SistemaPasajes.Models;
+@model List<ReservaCLS>
+
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+@using (Ajax.BeginForm("Filtrar", "", new AjaxOptions //ASP, Sabe el controlador pero tambien lo podemos ingresar
+{
+    HttpMethod = "POST",
+    UpdateTargetId = "divMisPrestamos",
+    InsertionMode = InsertionMode.Replace
+}, new { @id = "frmListado" }))
+{
+    <div id="divMisPrestamos">
+        <!--Llamo a la vista parcial y le paso la lista de reservas-->
+        @Html.Partial("_TablaMisReservas", Model);
+    </div>
 
+    <p style="text-align:center">
+        <button class="btn btn-primary" onclick="Grabar()">Grabar</button>
+    </p>
+}
+
+
+
+<script>
+
+    function Grabar() {
+
+        if (confirm("Desea guardar la informacion?") == 1) {
+            var total = document.getElementById("lblTotal").innerHTML;
+            if (total == "0") {
+                alert("Debe elegir un viaje para guardar");
+                return;
+            }
+            //Hago una llamada asincrona al servidor (mediante el controlador)
+            $.get("MisReservas/GuardarDatos/?total=" + total, function (data) { //data: tendra la respuesta
+
+                if (data == "OK") { //data tendra OK o "" (Vacio), dependiendo si se pudo guardar
+                    alert("Se guardo correctamente");
+                    $("#frmListado").trigger("submit"); //Refrescamos la tabla de la vista parcial
+                } else {
+                    alert("Ocurrio un error");
+                }
+            })
+        }
+    }
+
+
+    //Funcion para elimar un reserva realizada
+    function Eliminar(idViaje) {
+
+        if (confirm("Desea eliminar la reserva?") == 1) {
+
+            var url = "Reserva/Quitarcookie/?idViaje=" + idViaje;
+            $.get(url, function (data) {
+                if (data == "OK") {
+                    alert("Se realizo correctamente");
+                    $("#frmListado").trigger("submit"); //Enviamos el formulario (Refrescamos la vista parcial)
+                } else {
+                    alert("Ocurrio un error");
+                }
+            })
+        }
+    }
+
+</script>

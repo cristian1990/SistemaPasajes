@@ -38,7 +38,6 @@ namespace SistemaPasajes.Models
         public virtual DbSet<RolPagina> RolPagina { get; set; }
         public virtual DbSet<Sexo> Sexo { get; set; }
         public virtual DbSet<Sucursal> Sucursal { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<TipoBus> TipoBus { get; set; }
         public virtual DbSet<TipoContrato> TipoContrato { get; set; }
         public virtual DbSet<TipoUsuario> TipoUsuario { get; set; }
